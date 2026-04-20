@@ -1,8 +1,6 @@
 <template>
   <!-- SECTION 1 -->
   <section class="overlay">
-    <img class="bg" src="../assets/IMG1.png" />
-
     <div class="overlay-content">
       <p>SPRING / SUMMER 2026</p>
       <h2>Timeless Elegance</h2>
@@ -12,7 +10,9 @@
 
   <!-- SECTION 2 -->
   <section class="grid">
-    <div class="grid-left"></div>
+    <div class="grid-left">
+      <img src="../assets/IMG2.png" />
+    </div>
 
     <div class="grid-right"></div>
   </section>
@@ -73,10 +73,10 @@
 
 /* BUTTON */
 .overlay-content button {
-  padding: 12px 28px;
+  padding: 14px 28px;
   background: transparent;
   border-color: white;
-  border-width: 5px;
+  border-width: 2px;
   color: white;
   font-family: "FONTSPRING DEMO - The Seasons";
   cursor: pointer;
