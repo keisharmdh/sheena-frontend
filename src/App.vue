@@ -5,7 +5,7 @@ import router from "./router";
 </script>
 
 <template>
-  <Header />
+  <Header :class="['header', { scrolled: isScrolled }]" />
   <router-view />
   <Footer />
 </template>
