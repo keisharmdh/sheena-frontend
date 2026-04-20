@@ -33,9 +33,9 @@
       <div class="col">
         <p class="titlefooter">FOLLOW</p>
         <ul>
-          <li>Instagram</li>
-          <li>Shopee</li>
-          <li>Tiktok</li>
+          <li><a href="https://www.instagram.com/shnco___/" target="_blank">Instagram</a></li>
+          <li><a href="https://shopee.co.id/shnco___" target="_blank">Shopee</a></li>
+          <li><a href="https://www.tiktok.com/@meetthesheena" target="_blank">Tiktok</a></li>
         </ul>
       </div>
     </div>
@@ -50,74 +50,80 @@
 <style scoped>
 .footer {
   background: #f9f9f9;
-  padding: 80px 0 0;
+  padding-top: 80px;
 }
 
-/* MAIN CONTAINER */
+/* CONTAINER (SAMA SEPERTI HEADER) */
+
 .container {
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 40px;
   display: flex;
   justify-content: space-between;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 0px;
-  gap: 40px;
+  gap: 50px;
+  flex-wrap: wrap;
 }
 
 /* COLUMN */
+
 .col {
   flex: 1;
+  min-width: 160px;
 }
 
-.col:first-child {
-  flex: 2; /* bisa 1.5 / 2 / 3 sesuai kebutuhan */
+.about {
+  flex: 2;
 }
 
-/* TITLE FOOTER */
+/* TITLE */
+
 .titlefooter {
   color: #000;
   font-family: "FONTSPRING DEMO - The Seasons";
-  font-size: 25px;
-  font-weight: 500;
+  font-size: 22px;
   letter-spacing: 2px;
   margin-bottom: 16px;
 }
 
 /* DESCRIPTION */
+
 .desc {
   color: #82603d;
   font-family: "FONTSPRING DEMO - The Seasons";
-  font-size: 17px;
-  line-height: 22px;
-  font-weight: 200;
+  font-size: 16px;
+  line-height: 24px;
 }
 
 /* LIST */
-.col ul {
+
+ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  font-size: 17px;
 }
 
-.col li {
+li {
   margin-bottom: 8px;
   color: #82603d;
   font-family: "FONTSPRING DEMO - The Seasons";
-  font-size: 17px;
-  font-weight: 200;
+  font-size: 16px;
 }
 
-/* SOCIAL */
-.social {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  color: #82603d;
-  font-family: "FONTSPRING DEMO - The Seasons";
-  font-size: 14px;
+/* LINK */
+
+a {
+  text-decoration: none;
+  color: inherit;
 }
 
-/* BOTTOM BAR */
+a:hover {
+  text-decoration: underline;
+}
+
+/* BOTTOM */
+
 .bottom {
   border-top: 1px solid #ddd;
   margin-top: 60px;
@@ -130,5 +136,18 @@
   font-family: "FONTSPRING DEMO - The Seasons";
   font-size: 12px;
   letter-spacing: 1px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .about {
+    flex: 1;
+  }
 }
 </style>
