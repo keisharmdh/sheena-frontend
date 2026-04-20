@@ -62,13 +62,13 @@ onUnmounted(() => {
 
   z-index: 1000;
 
-  background: transparent;
+  background: rgba(255, 255, 255, 0.75);
   transition: all 0.3s ease;
 }
 
 /* SCROLL STATE */
 .header.scrolled {
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
