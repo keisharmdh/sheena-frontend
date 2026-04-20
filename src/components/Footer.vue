@@ -32,11 +32,11 @@
       <!-- COL 4 -->
       <div class="col">
         <p class="titlefooter">FOLLOW</p>
-        <div class="social">
-          <span>Instagram</span>
-          <span>Shopee</span>
-          <span>TikTok</span>
-        </div>
+        <ul>
+          <li>Instagram</li>
+          <li>Shopee</li>
+          <li>Tiktok</li>
+        </ul>
       </div>
     </div>
 

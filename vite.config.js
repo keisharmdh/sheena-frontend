@@ -5,3 +5,13 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [vue()],
 })
+
+import {fileURLToPath} from 'node:url'
+import { resolve } from 'node:dns'
+export default {
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  }
+}
