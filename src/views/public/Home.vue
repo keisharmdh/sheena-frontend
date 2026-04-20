@@ -14,7 +14,25 @@
       <img src="../assets/IMG2.png" />
     </div>
 
-    <div class="grid-right"></div>
+    <div class="grid-right">
+      <div class="top">
+        <div class="box">
+          <img src="IMG3.png" />
+        </div>
+        <div class="box">
+          <img src="IMG3.png" />
+        </div>
+      </div>
+
+      <div class="btm">
+        <div class="box">
+          <img src="IMG3.png" />
+        </div>
+        <div class="box">
+          <img src="IMG3.png" />
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- SECTION 3 -->
