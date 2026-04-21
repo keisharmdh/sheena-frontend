@@ -17,15 +17,34 @@
 
       <!-- RIGHT -->
       <div class="right">
-        <img src="../assets/Search.svg" class="icon" />
-        <img src="../assets/ShoppingBag.svg" class="icon" />
+        <img
+          src="../assets/Search.svg"
+          class="icon"
+          @click="isSearchOpen = true"
+          style="cursor: pointer"
+          ;
+        />
+        <img
+          src="../assets/ShoppingBag.svg"
+          class="icon"
+          @click="isBagOpen = true"
+          style="cursor: pointer"
+          ;
+        />
       </div>
+      <search-popup :is-open="isSearchOpen" @close="isSearchOpen = false" />
+      <shopping-bag-popup :is-open="isBagOpen" @close="isBagOpen = false" />
     </div>
   </header>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
+import ShoppingBagPopup from "./ShoppingBagPopup.vue";
+import SearchPopup from "./SearchPopup.vue";
+
+const isSearchOpen = ref(false);
+const isBagOpen = ref(false);
 
 const showSearch = ref(false);
 const showCart = ref(false);
