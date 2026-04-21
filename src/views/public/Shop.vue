@@ -208,34 +208,63 @@ const products = ref([
   },
   {
     id: 2,
-    name: "Miyari Silk Blouse",
-    price: 1190000,
-    oldPrice: 1590000,
-    category: "Tops",
-    collection: "Miyari",
-    image: "https://images.unsplash.com/photo-1551163943-3f6a855d1153?auto=format&fit=crop&w=600",
-    onSale: true,
+    name: "Diana Cashmere Dress",
+    collection: "NEW COLLECTION",
+    price: 2890000,
+    category: "Vest", // Atau Tops sesuai tab
+    // Gambar utama & tambahan
+    images: [
+      "/img/product-1.jpg", // Gambar besar utama (seperti di visual)
+      "/img/product-1-thumb1.jpg",
+      "/img/product-1-thumb2.jpg",
+      "/img/product-1-thumb3.jpg",
+    ],
+    onSale: false,
+    // Deskripsi lengkap
+    desc: "An exquisite cashmere dress that embodies understated luxury. Crafted from the finest cashmere, this piece drapes beautifully and offers unparalleled softness. The minimalist silhouette ensures versatility for both day and evening wear.",
+    // Atribut tambahan
+    material: "100% Premium Cashmere",
+    details: ["Relaxed fit", "Midi length", "Side pockets"],
   },
   {
     id: 3,
-    name: "Diana Cashmere Cardigan",
-    price: 2490000,
-    category: "Jacket",
-    collection: "Diana",
-    image:
-      "https://images.unsplash.com/photo-1434389677669-e08b4cac3105?auto=format&fit=crop&w=600",
+    name: "Diana Cashmere Dress",
+    collection: "NEW COLLECTION",
+    price: 2890000,
+    category: "Vest", // Atau Tops sesuai tab
+    // Gambar utama & tambahan
+    images: [
+      "/img/product-1.jpg", // Gambar besar utama (seperti di visual)
+      "/img/product-1-thumb1.jpg",
+      "/img/product-1-thumb2.jpg",
+      "/img/product-1-thumb3.jpg",
+    ],
     onSale: false,
+    // Deskripsi lengkap
+    desc: "An exquisite cashmere dress that embodies understated luxury. Crafted from the finest cashmere, this piece drapes beautifully and offers unparalleled softness. The minimalist silhouette ensures versatility for both day and evening wear.",
+    // Atribut tambahan
+    material: "100% Premium Cashmere",
+    details: ["Relaxed fit", "Midi length", "Side pockets"],
   },
   {
     id: 4,
-    name: "Valerie Wool Coat",
-    price: 3390000,
-    oldPrice: 4290000,
-    category: "Jacket",
-    collection: "Valerie",
-    image:
-      "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=600",
-    onSale: true,
+    name: "Diana Cashmere Dress",
+    collection: "NEW COLLECTION",
+    price: 2890000,
+    category: "Vest", // Atau Tops sesuai tab
+    // Gambar utama & tambahan
+    images: [
+      "/img/product-1.jpg", // Gambar besar utama (seperti di visual)
+      "/img/product-1-thumb1.jpg",
+      "/img/product-1-thumb2.jpg",
+      "/img/product-1-thumb3.jpg",
+    ],
+    onSale: false,
+    // Deskripsi lengkap
+    desc: "An exquisite cashmere dress that embodies understated luxury. Crafted from the finest cashmere, this piece drapes beautifully and offers unparalleled softness. The minimalist silhouette ensures versatility for both day and evening wear.",
+    // Atribut tambahan
+    material: "100% Premium Cashmere",
+    details: ["Relaxed fit", "Midi length", "Side pockets"],
   },
 ]);
 
