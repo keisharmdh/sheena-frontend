@@ -174,7 +174,7 @@ const openQuickView = (product) => {
 
 const goToDetail = (productId) => {
   // Logika untuk pindah ke halaman detail produk
-  console.log("Pindah ke halaman detail produk dengan ID:", productId);
+  router.push({ name: "ProductDetail", params: { id: productId } });
 };
 
 // States untuk Data

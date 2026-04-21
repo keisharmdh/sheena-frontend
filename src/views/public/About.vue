@@ -5,8 +5,14 @@
       <h1 class="serif-title">About SHEENA</h1>
       <p class="description">
         Founded on the principles of quiet luxury and refined aesthetics, SHEENA celebrates the art
-        of understated elegance. We believe that true style transcends trends... (dan seterusnya
-        sesuai gambar)
+        of understated elegance. We believe that true style transcends trends, residing in the
+        quality of craftsmanship, the integrity of materials, and the harmony of design. Founded on
+        the principles of quiet luxury and refined aesthetics, SHEENA celebrates the art of
+        understated elegance. We believe that true style transcends trends, residing in the quality
+        of craftsmanship, the integrity of materials, and the harmony of design. We create for the
+        discerning woman who values quality over quantity, who understands that luxury whispers
+        rather than shouts. This is fashion with intention—pieces that become more beautiful with
+        time and tell your unique story.
       </p>
     </section>
 
