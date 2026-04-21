@@ -105,9 +105,15 @@
     </div>
 
     <div :class="['product-display', `grid-${gridCols}`]">
-      <div v-for="product in sortedProducts" :key="product.id" class="product-card">
+      <div
+        v-for="product in sortedProducts"
+        :key="product.id"
+        class="product-card"
+        @click="goToDetail(product.id)"
+      >
         <div class="image-container">
           <img :src="product.image" :alt="product.name" />
+          <button class="btn-quick-view" @click.stop="openQuickView(product)">Quick View</button>
           <span v-if="product.onSale" class="sale-tag">SALE</span>
           <button class="add-to-bag-btn">+</button>
         </div>
@@ -124,6 +130,12 @@
         </div>
       </div>
     </div>
+
+    <QuickView
+      :isOpen="isQuickViewOpen"
+      :product="selectedProduct"
+      @close="isQuickViewOpen = false"
+    />
 
     <FilterPopup
       :isOpen="isFilterOpen"
@@ -145,12 +157,25 @@
 import { ref, computed } from "vue";
 import FilterPopup from "../../components/FilterPopup.vue";
 import SortPopup from "../../components/SortPopup.vue";
+import QuickView from "../../components/QuickViewPopup.vue";
 
 // States untuk UI
 const gridCols = ref(2);
 const isFilterOpen = ref(false);
 const isSortOpen = ref(false);
 const viewMode = ref("grid");
+const isQuickViewOpen = ref(false);
+const selectedProduct = ref(null);
+
+const openQuickView = (product) => {
+  selectedProduct.value = product;
+  isQuickViewOpen.value = true;
+};
+
+const goToDetail = (productId) => {
+  // Logika untuk pindah ke halaman detail produk
+  console.log("Pindah ke halaman detail produk dengan ID:", productId);
+};
 
 // States untuk Data
 const sortBy = ref("featured");
@@ -164,12 +189,22 @@ const products = ref([
   {
     id: 1,
     name: "Diana Cashmere Dress",
+    collection: "NEW COLLECTION",
     price: 2890000,
-    category: "Tops",
-    collection: "Diana",
-    image:
-      "https://images.unsplash.com/photo-1539109132314-3475961e149c?auto=format&fit=crop&w=600",
+    category: "Vest", // Atau Tops sesuai tab
+    // Gambar utama & tambahan
+    images: [
+      "/img/product-1.jpg", // Gambar besar utama (seperti di visual)
+      "/img/product-1-thumb1.jpg",
+      "/img/product-1-thumb2.jpg",
+      "/img/product-1-thumb3.jpg",
+    ],
     onSale: false,
+    // Deskripsi lengkap
+    desc: "An exquisite cashmere dress that embodies understated luxury. Crafted from the finest cashmere, this piece drapes beautifully and offers unparalleled softness. The minimalist silhouette ensures versatility for both day and evening wear.",
+    // Atribut tambahan
+    material: "100% Premium Cashmere",
+    details: ["Relaxed fit", "Midi length", "Side pockets"],
   },
   {
     id: 2,
@@ -483,6 +518,33 @@ const formatPrice = (val) => `Rp ${val.toLocaleString("id-ID")}`;
 
 .sale-price {
   color: #c64b4b;
+}
+
+.btn-quick-view {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -20%); /* Mulai sedikit di bawah */
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  padding: 12px 24px;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0; /* Sembunyi secara default */
+  transition: all 0.3s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.product-card:hover .btn-quick-view {
+  opacity: 1;
+  transform: translate(-50%, -50%); /* Naik ke tengah saat hover */
+}
+
+.btn-quick-view:hover {
+  background: #1a1a1a;
+  color: white;
 }
 
 /* Responsive (Mobile 1 Kolom) */
