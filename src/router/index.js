@@ -3,6 +3,9 @@ import { createRouter, createWebHistory } from "vue-router";
 //public
 import Home from "../views/public/Home.vue";
 import About from "../views/public/About.vue";
+import ContactUs from "../views/public/ContactUs.vue";
+import SizeGuide from "../views/public/SizeGuide.vue";
+import FAQ from "../views/public/FAQ.vue";
 
 const routes = [
   {
@@ -13,6 +16,21 @@ const routes = [
   {
     path: "/about",
     component: About,
+  },
+
+  {
+    path: "/contact-us",
+    component: ContactUs,
+  },
+
+  {
+    path: "/size-guide",
+    component: SizeGuide,
+  },
+
+  {
+    path: "/faq",
+    component: FAQ,
   },
 ];
 

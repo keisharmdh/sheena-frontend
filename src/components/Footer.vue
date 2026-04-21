@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import router from "../router";
+</script>
+
 <template>
   <footer class="footer">
     <div class="container">
@@ -23,9 +27,9 @@
       <div class="col">
         <p class="titlefooter">HELP</p>
         <ul>
-          <li>Contact Us</li>
-          <li>Size Guide</li>
-          <li>FAQ</li>
+          <li><router-link to="/contact-us">Contact Us</router-link></li>
+          <li><router-link to="/size-guide">Size Guide</router-link></li>
+          <li><router-link to="/faq">FAQ</router-link></li>
         </ul>
       </div>
 
