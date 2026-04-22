@@ -1,47 +1,50 @@
 <template>
   <div class="admin-layout">
-    <AdminSidebar />
+    <AdminSidebar :isOpen="isSidebarOpen" @close="isSidebarOpen = false" />
+
     <div class="main-wrapper">
-      <AdminHeader />
-      <main class="main-wrapper">
+      <AdminHeader @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+
+      <main class="content-container">
         <router-view />
       </main>
     </div>
+
+    <div v-if="isSidebarOpen" class="overlay" @click="isSidebarOpen = false"></div>
   </div>
 </template>
 
 <script setup>
-// Import kedua komponen yang baru dibuat
+import { ref } from "vue";
 import AdminSidebar from "../components/SidebarAd.vue";
 import AdminHeader from "../components/HeaderAd.vue";
-</script>
 
-<style>
-/* Reset dasar untuk area admin */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #f8f8f8;
-  font-family: "Inter", sans-serif;
-}
-</style>
+const isSidebarOpen = ref(false);
+</script>
 
 <style scoped>
 .admin-layout {
-  display: flex; /* Flexbox untuk Sidebar | Content */
+  display: flex;
   min-height: 100vh;
+  position: relative;
 }
 
 .main-wrapper {
-  flex: 1; /* Mengisi sisa ruang di kanan */
+  flex: 1;
   display: flex;
-  flex-direction: column; /* Menumpuk Header ^ Content */
-  overflow-x: hidden; /* Mencegah scroll horizontal */
+  flex-direction: column;
 }
 
 .content-container {
-  padding: 40px; /* Jarak dalam untuk konten halaman */
+  padding: 40px;
+  background-color: #f8f8f8;
   flex: 1;
-  background-color: #f8f8f8; /* Background abu-abu sangat muda sesuai visual login */
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.1);
+  z-index: 98; /* Di bawah sidebar, di atas konten */
 }
 </style>

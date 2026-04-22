@@ -1,260 +1,299 @@
 <template>
-  <aside class="admin-sidebar">
-    <div class="sidebar-header">
-      <h1 class="brand-logo">Sheena</h1>
-    </div>
+  <aside class="sidebar-container" :class="{ open: isOpen }">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">
+        <h1 class="logo-text">Sheena</h1>
+        <button class="close-mobile-btn" @click="$emit('close')">&times;</button>
+      </div>
 
-    <nav class="sidebar-nav">
-      <ul>
-        <li class="nav-item active">
-          <router-link to="/admin/dashboard">
-            <span class="icon">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <rect x="3" y="3" width="7" height="7"></rect>
-                <rect x="14" y="3" width="7" height="7"></rect>
-                <rect x="14" y="14" width="7" height="7"></rect>
-                <rect x="3" y="14" width="7" height="7"></rect>
-              </svg>
-            </span>
-            Dashboard
-          </router-link>
-        </li>
-
-        <li class="nav-item">
-          <router-link to="/admin/products">
-            <span class="icon">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
-                ></path>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
-                <line x1="12" y1="22.08" x2="12" y2="12"></line>
-              </svg>
-            </span>
-            Product Overview
-          </router-link>
-        </li>
-
-        <li class="nav-item has-dropdown">
-          <a href="#" @click.prevent="isContentOpen = !isContentOpen">
-            <div class="link-content">
-              <span class="icon">
+      <nav class="nav-menu">
+        <div class="menu-group">
+          <router-link to="/admin/dashboard" class="menu-item active">
+            <div class="item-content">
+              <span class="menu-icon">
                 <svg
-                  width="20"
-                  height="20"
+                  width="22"
+                  height="22"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <rect x="3" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="3" width="7" height="7"></rect>
+                  <rect x="14" y="14" width="7" height="7"></rect>
+                  <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+              </span>
+              <span class="menu-label">Dashboard</span>
+            </div>
+          </router-link>
+
+          <router-link to="/admin/products" class="menu-item">
+            <div class="item-content">
+              <span class="menu-icon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path
+                    d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                  ></path>
+                  <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                  <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                </svg>
+              </span>
+              <span class="menu-label">Product Overview</span>
+            </div>
+          </router-link>
+
+          <div class="menu-item dropdown" @click="isManageContentOpen = !isManageContentOpen">
+            <div class="item-content">
+              <span class="menu-icon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
                 >
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                 </svg>
               </span>
-              Manage Content
+              <span class="menu-label">Manage Content</span>
             </div>
-            <span class="arrow-icon" :class="{ open: isContentOpen }">
+            <span class="dropdown-arrow" :class="{ rotated: isManageContentOpen }">
               <svg
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
               >
-                <polyline points="6 9 12 15 18 9"></polyline>
+                <path d="M6 9l6 6 6-6"></path>
               </svg>
             </span>
-          </a>
-          <ul v-if="isContentOpen" class="dropdown-menu">
-            <li><router-link to="/admin/content/home">Home Page</router-link></li>
-            <li><router-link to="/admin/content/blog">Blog</router-link></li>
-          </ul>
-        </li>
+          </div>
 
-        <li class="nav-item">
-          <router-link to="/admin/reports">
-            <span class="icon">
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                <polyline points="17 6 23 6 23 12"></polyline>
-              </svg>
-            </span>
-            Sales Report
+          <router-link to="/admin/sales" class="menu-item">
+            <div class="item-content">
+              <span class="menu-icon">
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M23 6l-9.5 9.5-5-5L1 18"></path>
+                  <path d="M17 6h6v6"></path>
+                </svg>
+              </span>
+              <span class="menu-label">Sales Report</span>
+            </div>
           </router-link>
-        </li>
-      </ul>
-    </nav>
 
-    <div class="sidebar-footer">
-      <button class="btn-logout" @click="handleLogout">
-        <span class="icon">
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-            <polyline points="16 17 21 12 16 7"></polyline>
-            <line x1="21" y1="12" x2="9" y2="12"></line>
-          </svg>
-        </span>
-        Logout
-      </button>
+          <button class="logout-btn" @click="handleLogout">
+            <span class="logout-icon">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+            </span>
+            <span class="logout-label">Logout</span>
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <router-link to="/" class="back-link">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Website
+      </router-link>
     </div>
   </aside>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { useRouter } from "vue-router";
 
-const isContentOpen = ref(false); // State untuk dropdown
-const router = useRouter();
+// Definisi Props agar bisa menerima status 'isOpen' dari Layout
+defineProps({
+  isOpen: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+// Definisi Emits untuk memberitahu Layout jika sidebar ingin ditutup
+defineEmits(["close"]);
+
+const isManageContentOpen = ref(false);
 
 const handleLogout = () => {
-  if (confirm("Are you sure you want to logout?")) {
-    // Logika hapus token disini
-    router.push("/admin/login");
-  }
+  // Tambahkan logika logout di sini
+  console.log("Logging out...");
 };
 </script>
 
 <style scoped>
-.admin-sidebar {
-  width: 260px;
-  background-color: white;
-  border-right: 1px solid #f0f0f0;
+.sidebar-container {
+  width: 280px;
+  height: 100vh;
+  background-color: #ffffff;
+  border-right: 1px solid #f2f2f2;
   display: flex;
   flex-direction: column;
-  padding: 30px 20px;
-  height: 100vh;
-  position: sticky;
+  justify-content: space-between;
+  position: fixed; /* Fixed agar tidak merusak tata letak konten utama */
+  left: -280px; /* Default: Tersembunyi di kiri luar layar */
   top: 0;
+  z-index: 1000;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animasi halus */
 }
 
-.sidebar-header {
-  margin-bottom: 50px;
-  text-align: left;
-  padding-left: 10px;
+/* Ketika class 'open' ada, geser ke posisi terlihat */
+.sidebar-container.open {
+  transform: translateX(280px);
 }
-.brand-logo {
+
+.sidebar-top {
+  padding: 40px 20px;
+}
+
+.sidebar-logo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 15px 30px;
+  border-bottom: 1px solid #f9f9f9;
+  margin-bottom: 30px;
+}
+
+.logo-text {
   font-family: "FONTSPRING DEMO - The Seasons", serif;
-  font-size: 26px;
+  font-size: 28px;
+  color: #8c6a43;
   font-weight: 400;
-  color: #8c6a43; /* Warna khas SHEENA */
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
-.sidebar-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.close-mobile-btn {
+  display: none; /* Sembunyikan di desktop, munculkan di mobile via media query jika perlu */
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #8c6a43;
+  cursor: pointer;
 }
 
-.nav-item {
-  margin-bottom: 5px;
+.nav-menu {
+  flex-grow: 1;
 }
-.nav-item a {
+
+.menu-item,
+.logout-btn {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 15px;
+  padding: 14px 18px;
+  margin-bottom: 10px;
   text-decoration: none;
-  color: #666; /* Warna text menu default */
-  font-size: 14px;
-  border-radius: 10px;
-  transition: all 0.3s ease;
-}
-
-.nav-item .link-content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-/* Styling untuk menu ACTIVE sesuai gambar (putih bersih, shadow halus) */
-.nav-item.active a {
-  background-color: white;
-  color: #8c6a43; /* Text cokelat saat aktif */
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); /* Shadow halus */
-  font-weight: 500;
-}
-.nav-item.active .icon svg {
-  stroke: #8c6a43;
-} /* Ikon ikut cokelat */
-
-/* Hover state untuk menu non-aktif */
-.nav-item:not(.active) a:hover {
-  background-color: #fdfaf7;
-  color: #1a1a1a;
-}
-
-/* Dropdown styling */
-.has-dropdown .arrow-icon {
-  transition: transform 0.3s;
-  color: #ccc;
-}
-.has-dropdown .arrow-icon.open {
-  transform: rotate(180deg);
-  color: #8c6a43;
-}
-.dropdown-menu {
-  padding-left: 35px !important;
-  margin-top: 5px !important;
-}
-.dropdown-menu a {
-  padding: 10px !important;
-  font-size: 13px;
-  color: #888;
-}
-
-/* Bagian Footer Sidebar (Logout) */
-.sidebar-footer {
-  margin-top: auto;
-  padding-top: 30px;
-  border-top: 1px solid #f0f0f0;
-}
-.btn-logout {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 15px;
   background: none;
   border: none;
-  color: #d93025; /* Warna MERAH sesuai gambar */
+  width: 100%;
+  color: #999;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.item-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.menu-label,
+.logout-label {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.menu-item.active {
+  background-color: #ffffff;
+  color: #8c6a43;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-arrow {
+  transition: transform 0.3s;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.logout-btn {
+  color: #e53e3e;
+  margin-top: 20px;
+}
+
+.sidebar-bottom {
+  padding: 20px;
+  border-top: 1px solid #f2f2f2;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #8c6a43;
   font-size: 14px;
   font-weight: 500;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: 0.3s;
-}
-.btn-logout:hover {
-  background-color: #fff1f0;
 }
 </style>

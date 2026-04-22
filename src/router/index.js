@@ -11,7 +11,8 @@ import FAQ from "../views/public/FAQ.vue";
 import ShoppingBag from "../views/public/ShoppingBag.vue";
 
 //admin
-import Login from "../views/admin/login.vue";
+import Login from "../views/admin/Login.vue";
+import Dashboard from "../views/admin/Dashboard.vue";
 
 const routes = [
   // Group Halaman Public (Pake Header & Footer)
@@ -65,7 +66,7 @@ const routes = [
   {
     path: "/admin/login",
     name: "Login",
-    component: () => import("../views/admin/login.vue"),
+    component: () => import("../views/admin/Login.vue"),
   },
 
   {

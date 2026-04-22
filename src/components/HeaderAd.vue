@@ -1,7 +1,7 @@
 <template>
   <header class="admin-header">
     <div class="header-left">
-      <button class="icon-btn hamburger-btn">
+      <button class="icon-btn hamburger-btn" @click="$emit('toggle-sidebar')">
         <svg
           width="24"
           height="24"
@@ -84,6 +84,10 @@
     </div>
   </header>
 </template>
+
+<script setup>
+defineEmits(["toggle-sidebar"]);
+</script>
 
 <style scoped>
 .admin-header {
