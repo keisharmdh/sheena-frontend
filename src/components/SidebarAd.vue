@@ -8,7 +8,7 @@
 
       <nav class="nav-menu">
         <div class="menu-group">
-          <router-link to="/admin/dashboard" class="menu-item active">
+          <router-link to="/admin/dashboard" class="menu-item" active-class="active">
             <div class="item-content">
               <span class="menu-icon">
                 <svg
@@ -31,7 +31,7 @@
             </div>
           </router-link>
 
-          <router-link to="/admin/products" class="menu-item">
+          <router-link to="/admin/products-overview" class="menu-item" active-class="active">
             <div class="item-content">
               <span class="menu-icon">
                 <svg
@@ -266,6 +266,7 @@ const handleLogout = () => {
   background-color: #ffffff;
   color: #8c6a43;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f0f0f0;
 }
 
 .dropdown-arrow {

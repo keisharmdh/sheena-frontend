@@ -13,6 +13,7 @@ import ShoppingBag from "../views/public/ShoppingBag.vue";
 //admin
 import Login from "../views/admin/Login.vue";
 import Dashboard from "../views/admin/Dashboard.vue";
+import ProductsOverview from "../views/admin/ProductsOverview.vue";
 
 const routes = [
   // Group Halaman Public (Pake Header & Footer)
@@ -77,6 +78,11 @@ const routes = [
         path: "dashboard", // Akses: /admin/dashboard
         name: "Dashboard",
         component: () => import("../views/admin/Dashboard.vue"),
+      },
+      {
+        path: "products-overview", // Akses: /admin/product-overview
+        name: "ProductsOverview",
+        component: () => import("../views/admin/ProductsOverview.vue"),
       },
       // Halaman admin lainnya di sini...
     ],
