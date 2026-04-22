@@ -55,42 +55,82 @@
             </div>
           </router-link>
 
-          <div class="menu-item dropdown" @click="isManageContentOpen = !isManageContentOpen">
-            <div class="item-content">
-              <span class="menu-icon">
+          <div class="dropdown-container">
+            <button
+              @click="isContentOpen = !isContentOpen"
+              class="menu-item w-full"
+              :class="{ 'active-parent': isChildActive }"
+            >
+              <div class="item-content justify-between w-full">
+                <div class="flex items-center gap-3">
+                  <span class="menu-icon">
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                    </svg>
+                  </span>
+                  <span class="menu-label">Manage Content</span>
+                </div>
                 <svg
-                  width="22"
-                  height="22"
+                  :class="{ 'rotate-180': isContentOpen }"
+                  class="arrow-icon"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
                 >
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                  <polyline points="6 9 12 15 18 9" />
                 </svg>
-              </span>
-              <span class="menu-label">Manage Content</span>
-            </div>
-            <span class="dropdown-arrow" :class="{ rotated: isManageContentOpen }">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M6 9l6 6 6-6"></path>
-              </svg>
-            </span>
+              </div>
+            </button>
+            <transition name="expand">
+              <div v-if="isContentOpen" class="sub-menu-list">
+                <router-link
+                  to="/admin/home-content"
+                  class="sub-menu-item"
+                  active-class="active-sub"
+                >
+                  <span class="menu-icon">🏠</span>
+                  <span class="sub-label">Home</span>
+                </router-link>
+                <router-link
+                  to="/admin/shop-content"
+                  class="sub-menu-item"
+                  active-class="active-sub"
+                >
+                  <span class="menu-icon">🛍️</span>
+                  <span class="sub-label">Shop</span>
+                </router-link>
+                <router-link
+                  to="/admin/about-content"
+                  class="sub-menu-item"
+                  active-class="active-sub"
+                >
+                  <span class="menu-icon">ℹ️</span>
+                  <span class="sub-label">About</span>
+                </router-link>
+                <router-link
+                  to="/admin/footer-content"
+                  class="sub-menu-item"
+                  active-class="active-sub"
+                >
+                  <span class="menu-icon">💻</span>
+                  <span class="sub-label">Footer</span>
+                </router-link>
+              </div>
+            </transition>
           </div>
 
-          <router-link to="/admin/sales" class="menu-item">
+          <router-link to="/admin/sales" class="menu-item" active-class="active">
             <div class="item-content">
               <span class="menu-icon">
                 <svg
@@ -156,9 +196,12 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue"; //
+import { useRoute } from "vue-router"; //
 
-// Definisi Props agar bisa menerima status 'isOpen' dari Layout
+const route = useRoute(); //
+
+// Props untuk kontrol sidebar mobile (jika ada)
 defineProps({
   isOpen: {
     type: Boolean,
@@ -166,10 +209,18 @@ defineProps({
   },
 });
 
-// Definisi Emits untuk memberitahu Layout jika sidebar ingin ditutup
+// Emits untuk menutup sidebar
 defineEmits(["close"]);
 
-const isManageContentOpen = ref(false);
+// State untuk membuka/tutup dropdown "Manage Content"
+// Disetel true agar terbuka otomatis sesuai gambar referensi
+const isContentOpen = ref(true);
+
+// Logic untuk mengecek apakah sedang berada di halaman child (Home, Shop, dsb)
+// Agar parent "Manage Content" tetap terlihat aktif
+const isChildActive = computed(() => {
+  return route.path.includes("/admin/content/");
+});
 
 const handleLogout = () => {
   // Tambahkan logika logout di sini
@@ -186,16 +237,18 @@ const handleLogout = () => {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  position: fixed; /* Fixed agar tidak merusak tata letak konten utama */
-  left: -280px; /* Default: Tersembunyi di kiri luar layar */
+  position: fixed;
   top: 0;
+  left: 0; /* Mulai dari titik 0 */
   z-index: 1000;
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animasi halus */
+  /* Sembunyikan dengan menggeser dirinya sendiri ke kiri sejauh lebarnya */
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Ketika class 'open' ada, geser ke posisi terlihat */
 .sidebar-container.open {
-  transform: translateX(280px);
+  transform: translateX(0px);
 }
 
 .sidebar-top {
@@ -296,5 +349,69 @@ const handleLogout = () => {
   color: #8c6a43;
   font-size: 14px;
   font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .close-mobile-btn {
+    display: block;
+  }
+}
+
+/* Container Sub Menu */
+.sub-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Jarak antar card sub-menu */
+  padding-left: 45px; /* Menjorok ke dalam agar sejajar di bawah teks Manage Content */
+  padding-right: 15px;
+  margin-top: 5px;
+}
+
+/* Style Dasar Sub Menu (Sebelum Aktif) */
+.sub-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  text-decoration: none;
+  color: #999; /* Warna teks default abu-abu */
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid transparent; /* Agar tidak loncat saat border muncul di status aktif */
+}
+
+/* Style Saat Sub Menu Aktif (Menjadi Card) */
+.sub-menu-item.active-sub {
+  background-color: #ffffff; /* Background putih bersih */
+  color: #8c6a43; /* Warna cokelat khas Sheena */
+  border: 1px solid #f0f0f0; /* Border tipis abu-abu terang */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Shadow halus untuk efek mengangkat/card */
+}
+
+/* Hover effect agar interaktif */
+.sub-menu-item:hover:not(.active-sub) {
+  background-color: #f9f9f9;
+  color: #8c6a43;
+}
+
+/* Icon dalam sub menu */
+.sub-menu-item .menu-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animasi Expand untuk dropdown */
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease-in-out;
+  max-height: 250px; /* Sesuaikan dengan jumlah menu */
+  overflow: hidden;
+}
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
 }
 </style>

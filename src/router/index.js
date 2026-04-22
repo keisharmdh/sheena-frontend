@@ -14,6 +14,11 @@ import ShoppingBag from "../views/public/ShoppingBag.vue";
 import Login from "../views/admin/Login.vue";
 import Dashboard from "../views/admin/Dashboard.vue";
 import ProductsOverview from "../views/admin/ProductsOverview.vue";
+import HomeContent from "../views/admin/HomeContent.vue";
+import ShopContent from "../views/admin/ShopContent.vue";
+import AboutContent from "../views/admin/AboutContent.vue";
+import FooterContent from "../views/admin/FooterContent.vue";
+import Report from "../views/admin/Report.vue";
 
 const routes = [
   // Group Halaman Public (Pake Header & Footer)
@@ -84,70 +89,35 @@ const routes = [
         name: "ProductsOverview",
         component: () => import("../views/admin/ProductsOverview.vue"),
       },
+      {
+        path: "home-content", // Akses: /admin/home-content
+        name: "HomeContent",
+        component: () => import("../views/admin/HomeContent.vue"),
+      },
+      {
+        path: "shop-content", // Akses: /admin/shop-content
+        name: "ShopContent",
+        component: () => import("../views/admin/ShopContent.vue"),
+      },
+      {
+        path: "about-content", // Akses: /admin/about-content
+        name: "AboutContent",
+        component: () => import("../views/admin/AboutContent.vue"),
+      },
+      {
+        path: "footer-content", // Akses: /admin/footer-content
+        name: "FooterContent",
+        component: () => import("../views/admin/FooterContent.vue"),
+      },
+      {
+        path: "report", // Akses: /admin/report
+        name: "Report",
+        component: () => import("../views/admin/Report.vue"),
+      },
       // Halaman admin lainnya di sini...
     ],
   },
-  // Group Halaman Admin (POLOS / Tanpa Header & Footer Toko)
-  // {
-  //   path: "/admin",
-  //   component: () => import("../layouts/AdminLayout.vue"),
-  //   children: [
-  //     {
-  //       path: "login",
-  //       name: "Login",
-  //       component: () => import("../views/admin/login.vue"),
-  //     },
-  //   ],
-  // },
 ];
-
-// const routes = [
-//   {
-//     path: "/",
-//     component: Home,
-//   },
-
-//   {
-//     path: "/shop",
-//     component: Shop,
-//   },
-
-//   {
-//     path: "/product-detail",
-//     component: ProductDetail,
-//   },
-
-//   {
-//     path: "/about",
-//     component: About,
-//   },
-
-//   {
-//     path: "/contact-us",
-//     component: ContactUs,
-//   },
-
-//   {
-//     path: "/size-guide",
-//     component: SizeGuide,
-//   },
-
-//   {
-//     path: "/faq",
-//     component: FAQ,
-//   },
-
-//   {
-//     path: "/shopping-bag",
-//     component: ShoppingBag,
-//   },
-
-//   //admin
-//   {
-//     path: "/login",
-//     component: Login,
-//   },
-// ];
 
 const router = createRouter({
   history: createWebHistory(),
