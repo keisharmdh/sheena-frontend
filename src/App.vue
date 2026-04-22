@@ -1,11 +1,7 @@
-<script setup>
-import Header from "./components/Header.vue";
-import Footer from "./components/Footer.vue";
-import router from "./router";
-</script>
-
 <template>
-  <Header :class="['header', { scrolled: isScrolled }]" />
   <router-view />
-  <Footer />
 </template>
+
+<script setup>
+// Tidak perlu import Header/Footer di sini lagi
+</script>

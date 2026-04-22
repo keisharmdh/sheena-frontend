@@ -151,7 +151,7 @@ const newArrivals = [
   height: 500px;
 
   /* background image */
-  background-image: url("src/assets/IMG1.png");
+  background-image: url("../public/IMG1.png");
   background-size: cover;
   background-position: center;
 
