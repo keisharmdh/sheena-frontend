@@ -78,7 +78,7 @@
         Curated pieces that embody timeless sophistication. Each garment is thoughtfully designed to
         elevate your wardrobe with understated luxury and enduring style.
       </p>
-      <button class="btn-outline">View Collection</button>
+      <RouterLink to="/shop" class="btn-outline">View Collection</RouterLink>
     </div>
     <div class="feature-image">
       <img src="../public/IMG_FEATURE.png" alt="Featured" />
@@ -129,7 +129,7 @@
     </div>
 
     <div class="view-all-container">
-      <button class="btn-outline">Explore Full Collection</button>
+      <RouterLink to="/shop" class="btn-outline">Explore Full Collection</RouterLink>
     </div>
   </section>
 </template>

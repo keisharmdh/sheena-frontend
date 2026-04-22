@@ -8,6 +8,7 @@ import About from "../views/public/About.vue";
 import ContactUs from "../views/public/ContactUs.vue";
 import SizeGuide from "../views/public/SizeGuide.vue";
 import FAQ from "../views/public/FAQ.vue";
+import ShoppingBag from "../views/public/ShoppingBag.vue";
 
 const routes = [
   {
@@ -43,6 +44,11 @@ const routes = [
   {
     path: "/faq",
     component: FAQ,
+  },
+
+  {
+    path: "/shopping-bag",
+    component: ShoppingBag,
   },
 ];
 

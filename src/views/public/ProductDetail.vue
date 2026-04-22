@@ -1,23 +1,20 @@
 <template>
-  <div class="product-detail-page" v-if="product">
-    <nav class="detail-nav">
-      <button @click="$router.back()" class="back-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-        Back to Collection
-      </button>
+  <div class="product-detail-container" v-if="product">
+    <nav class="back-nav">
+      <router-link to="/shop" class="back-btn">
+        <span class="arrow">&lsaquo;</span> Back to Collection
+      </router-link>
     </nav>
 
-    <div class="main-content">
+    <div class="main-detail-wrapper">
       <div class="gallery-section">
-        <div class="main-image-wrapper">
-          <img :src="activeImage || product.images[0]" alt="Main Product" />
+        <div class="main-image-display">
+          <img :src="activeImage || product.images[0]" alt="Product display" />
         </div>
-        <div class="thumbnail-list">
+        <div class="thumbnail-row">
           <div
-            v-for="(img, idx) in product.images"
-            :key="idx"
+            v-for="(img, index) in product.images"
+            :key="index"
             class="thumb-item"
             :class="{ active: activeImage === img }"
             @click="activeImage = img"
@@ -28,19 +25,18 @@
       </div>
 
       <div class="info-section">
-        <span class="label-new">{{ product.collection }}</span>
-        <h1 class="product-title">{{ product.name }}</h1>
-        <p class="product-price">Rp {{ product.price.toLocaleString("id-ID") }}</p>
+        <p class="collection-label">{{ product.collection }}</p>
+        <h1 class="title-serif">{{ product.name }}</h1>
+        <p class="price-text">Rp {{ product.price.toLocaleString("id-ID") }}</p>
 
-        <p class="description">{{ product.desc }}</p>
+        <p class="product-description">{{ product.description }}</p>
 
-        <div class="selector-group">
-          <p class="group-label">SELECT SIZE</p>
-          <div class="size-options">
+        <div class="option-group">
+          <label>SELECT SIZE</label>
+          <div class="size-chips">
             <button
               v-for="size in sizes"
               :key="size"
-              class="size-btn"
               :class="{ active: selectedSize === size }"
               @click="selectedSize = size"
             >
@@ -49,27 +45,27 @@
           </div>
         </div>
 
-        <div class="action-buttons">
-          <button class="btn-bag" @click="addToBag">+ Add to Bag</button>
-          <a href="#" class="btn-shopee">Checkout on Shopee</a>
+        <div class="button-group">
+          <button class="btn-primary-filled">+ Add to Bag</button>
+          <button class="btn-secondary-outline">Checkout on Shopee</button>
         </div>
 
-        <div class="specs-container">
-          <div class="spec-block">
-            <p class="spec-title">MATERIAL</p>
-            <p class="spec-text">{{ product.material }}</p>
+        <div class="specs-accordion">
+          <div class="spec-item">
+            <label>MATERIAL</label>
+            <p>{{ product.material }}</p>
           </div>
 
-          <div class="spec-block">
-            <p class="spec-title">DETAILS</p>
-            <ul class="spec-list">
+          <div class="spec-item">
+            <label>DETAILS</label>
+            <ul class="check-list">
               <li v-for="detail in product.details" :key="detail">{{ detail }}</li>
             </ul>
           </div>
 
-          <div class="spec-block">
-            <p class="spec-title">CARE INSTRUCTIONS</p>
-            <ul class="spec-list care">
+          <div class="spec-item">
+            <label>CARE INSTRUCTIONS</label>
+            <ul class="check-list">
               <li v-for="care in product.careInstructions" :key="care">{{ care }}</li>
             </ul>
           </div>
@@ -77,16 +73,11 @@
       </div>
     </div>
 
-    <section class="related-products">
-      <h2 class="section-title">You May Also Like</h2>
+    <section class="related-section">
+      <h2 class="title-serif text-center">You May Also Like</h2>
       <div class="related-grid">
-        <div
-          v-for="item in relatedProducts"
-          :key="item.id"
-          class="related-card"
-          @click="goToProduct(item.id)"
-        >
-          <div class="rel-img">
+        <div v-for="item in relatedProducts" :key="item.id" class="related-card">
+          <div class="rel-img-box">
             <img :src="item.image" :alt="item.name" />
           </div>
           <h3>{{ item.name }}</h3>
@@ -97,116 +88,49 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
-
-const route = useRoute();
-const router = useRouter();
-
-const product = ref(null);
-const activeImage = ref(null);
-const selectedSize = ref(null);
-const sizes = ["XS", "S", "M", "L"];
-
-onMounted(() => {
-  const productId = route.params.id;
-  fetchProductById(productId);
-});
-
-// Mock Data (Sama dengan yang ada di Shop/QuickView)
-const fetchProductData = (id) => {
-  // Simulasi fetch data berdasarkan ID
-  product.value = {
-    id: id,
-    name: "Miyari Silk Blouse",
-    collection: "NEW COLLECTION",
-    price: 1190000,
-    desc: "A timeless silk blouse featuring a fluid drape and elegant finish. Made from pure mulberry silk, this piece offers luxurious comfort and sophistication. Perfect for layering or wearing on its own.",
-    images: ["/img/miyari-1.jpg", "/img/miyari-2.jpg", "/img/miyari-3.jpg"],
-    material: "100% Mulberry Silk",
-    details: [
-      "Classic collar",
-      "Long sleeves with button cuffs",
-      "Mother of pearl buttons",
-      "Made in France",
-    ],
-    careInstructions: ["Hand wash cold", "Do not wring", "Lay flat to dry", "Steam iron if needed"],
-  };
-  activeImage.value = product.value.images[0];
-};
-
-const relatedProducts = ref([
-  { id: 101, name: "Diana Cashmere Dress", price: 2890000, image: "/img/diana-dress.jpg" },
-  { id: 102, name: "Diana Cashmere Cardigan", price: 2490000, image: "/img/diana-cardigan.jpg" },
-  { id: 103, name: "Valerie Wool Coat", price: 3390000, image: "/img/valerie-coat.jpg" },
-]);
-
-const goToProduct = (id) => {
-  router.push(`/product/${id}`);
-  window.scrollTo(0, 0);
-};
-
-onMounted(() => fetchProductData(route.params.id));
-watch(
-  () => route.params.id,
-  (newId) => fetchProductData(newId),
-);
-</script>
-
 <style scoped>
-.product-detail-page {
-  padding: 120px 8% 80px;
-  max-width: 1600px;
+.product-detail-container {
+  padding: 120px 5% 80px;
+  max-width: 1440px;
   margin: 0 auto;
 }
 
-.detail-nav {
+.back-nav {
   margin-bottom: 40px;
 }
-.back-link {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.back-btn {
+  text-decoration: none;
   font-size: 13px;
   color: #888;
-  transition: 0.3s;
-}
-.back-link:hover {
-  color: #1a1a1a;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-.main-content {
+.main-detail-wrapper {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1.1fr 0.9fr;
   gap: 80px;
   align-items: flex-start;
 }
 
-/* Gallery Style */
+/* Gallery Styles */
 .gallery-section {
   position: sticky;
   top: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
 }
-.main-image-wrapper {
+.main-image-display {
   background: #f9f9f9;
-  width: 100%;
   aspect-ratio: 3/4;
-  overflow: hidden;
+  margin-bottom: 20px;
 }
-.main-image-wrapper img {
+.main-image-display img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.thumbnail-list {
+.thumbnail-row {
   display: flex;
   gap: 15px;
 }
@@ -223,170 +147,164 @@ watch(
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 .thumb-item.active img {
   opacity: 1;
 }
 
-/* Info Style */
-.label-new {
+/* Info Styles */
+.title-serif {
+  font-family: "FONTSPRING DEMO - The Seasons", serif;
+  font-size: 42px;
+  font-weight: 400;
+  margin: 15px 0;
+}
+
+.collection-label {
   font-size: 11px;
   letter-spacing: 2px;
   color: #8c6a43;
+  text-transform: uppercase;
 }
-.product-title {
-  font-family: "Playfair Display", serif;
-  font-size: 42px;
-  margin: 15px 0;
-  font-weight: 400;
-}
-.product-price {
+
+.price-text {
   font-size: 22px;
   margin-bottom: 30px;
-  color: #1a1a1a;
 }
-.description {
+.product-description {
   color: #666;
   line-height: 1.8;
   font-size: 15px;
   margin-bottom: 40px;
 }
 
-/* Selectors & Buttons */
-.group-label {
+/* Options & Buttons */
+.option-group label {
+  display: block;
   font-size: 11px;
   font-weight: bold;
   margin-bottom: 15px;
 }
-.size-options {
+
+.size-chips {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 40px;
 }
-.size-btn {
-  padding: 12px 25px;
+.size-chips button {
+  padding: 12px 24px;
   border: 1px solid #ddd;
   background: white;
   cursor: pointer;
   transition: 0.3s;
-  font-size: 13px;
 }
-.size-btn.active {
+.size-chips button.active {
   background: #1a1a1a;
   color: white;
   border-color: #1a1a1a;
 }
 
-.action-buttons {
+.button-group {
   display: flex;
   flex-direction: column;
   gap: 15px;
   margin-bottom: 60px;
 }
-.btn-bag {
-  background: #8c6a43;
+
+.btn-primary-filled {
+  background: #8c6a43; /* Signature Brown */
   color: white;
   border: none;
   padding: 18px;
-  cursor: pointer;
-  font-size: 13px;
   text-transform: uppercase;
   letter-spacing: 1px;
+  cursor: pointer;
 }
-.btn-shopee {
-  text-align: center;
+
+.btn-secondary-outline {
+  background: white;
   border: 1px solid #8c6a43;
   color: #8c6a43;
   padding: 18px;
-  text-decoration: none;
-  font-size: 13px;
+  cursor: pointer;
 }
 
-/* Specs Style (Dashed Borders) */
-.specs-container {
+/* Specs Accordion */
+.specs-accordion {
   border-top: 1px solid #eee;
   padding-top: 40px;
 }
-.spec-block {
+.spec-item {
   margin-bottom: 35px;
 }
-.spec-title {
+.spec-item label {
+  display: block;
   font-size: 11px;
   font-weight: bold;
   color: #999;
   letter-spacing: 1px;
   margin-bottom: 12px;
 }
-.spec-list {
+
+.check-list {
   list-style: none;
   padding: 0;
 }
-.spec-list li {
+.check-list li {
   position: relative;
   padding-left: 20px;
   font-size: 14px;
   color: #555;
   margin-bottom: 8px;
 }
-.spec-list li::before {
+.check-list li::before {
   content: "✓";
   position: absolute;
   left: 0;
   color: #8c6a43;
 }
 
-/* Related Products Section */
-.related-products {
+/* Related Products */
+.related-section {
   margin-top: 120px;
-  border-top: 1px solid #eee;
   padding-top: 80px;
-  text-align: center;
-}
-.section-title {
-  font-family: "Playfair Display", serif;
-  font-size: 32px;
-  margin-bottom: 60px;
-  font-weight: 400;
+  border-top: 1px solid #eee;
 }
 .related-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
+  margin-top: 50px;
 }
-.related-card {
-  cursor: pointer;
-  text-align: left;
-}
-.rel-img {
-  background: #f7f7f7;
+.rel-img-box {
   aspect-ratio: 3/4;
+  background: #f7f7f7;
   margin-bottom: 15px;
-  overflow: hidden;
 }
-.rel-img img {
+.rel-img-box img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: 0.5s;
-}
-.related-card:hover .rel-img img {
-  transform: scale(1.05);
 }
 .related-card h3 {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 400;
   margin-bottom: 5px;
 }
 .related-card p {
-  font-size: 13px;
+  font-size: 14px;
   color: #888;
 }
 
-/* Responsive */
+.text-center {
+  text-align: center;
+}
+
 @media (max-width: 1024px) {
-  .main-content {
+  .main-detail-wrapper {
     grid-template-columns: 1fr;
+    gap: 40px;
   }
   .gallery-section {
     position: relative;
