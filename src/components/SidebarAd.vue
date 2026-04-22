@@ -130,7 +130,7 @@
             </transition>
           </div>
 
-          <router-link to="/admin/sales" class="menu-item" active-class="active">
+          <router-link to="/admin/report" class="menu-item" active-class="active">
             <div class="item-content">
               <span class="menu-icon">
                 <svg
