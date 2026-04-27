@@ -137,7 +137,7 @@
 <script setup>
 // Contoh data untuk slider
 const newArrivals = [
-  { id: 1, name: "Diana Cashmere Dress", price: 2890000, image: "../public/IMG_PROD1.png" },
+  { id: 1, name: "Diana Cashmere Dress", price: 2890000, image: "../public/IMG1.png" },
   { id: 2, name: "Miyari Silk Blouse", price: 1190000, image: "../public/IMG_PROD2.png" },
   { id: 3, name: "Diana Cashmere Cardigan", price: 2490000, image: "../public/IMG_PROD3.png" },
   { id: 4, name: "Valerie Wool Coat", price: 3390000, image: "../public/IMG_PROD4.png" },
@@ -415,8 +415,12 @@ const newArrivals = [
   align-items: flex-start;
 }
 
+.serif-title {
+  font-family: "FONTSPRING DEMO - The Seasons";
+}
+
 .feature-text .description {
-  font-family: "Inter", sans-serif;
+  font-family: "FONTSPRING DEMO - The Seasons";
   font-size: 15px;
   line-height: 1.8;
   color: #666;
