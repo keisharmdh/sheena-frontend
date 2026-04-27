@@ -81,7 +81,7 @@
       <RouterLink to="/shop" class="btn-outline">View Collection</RouterLink>
     </div>
     <div class="feature-image">
-      <img src="../public/IMG_FEATURE.png" alt="Featured" />
+      <img src="../public/Katalog6.png" alt="Featured" />
     </div>
   </section>
 
@@ -89,13 +89,13 @@
   <section class="section-editors-picks">
     <div class="section-header">
       <p class="label">CURATED SELECTION</p>
-      <h2 class="serif-title">Editor's Picks</h2>
+      <h2 class="serif-title">Editors Picks</h2>
     </div>
 
     <div class="picks-grid">
       <div class="pick-large">
         <div class="img-wrapper">
-          <img src="../public/IMG_PICK1.png" alt="Pick 1" />
+          <img src="../public/K1.png" alt="Pick 1" />
           <button class="btn-overlay-add">+ Add to Bag</button>
         </div>
         <div class="pick-info">
@@ -107,7 +107,7 @@
       <div class="pick-column">
         <div class="pick-small">
           <div class="img-wrapper">
-            <img src="../public/IMG_PICK2.png" alt="Pick 2" />
+            <img src="../public/K2.png" alt="Pick 2" />
             <button class="btn-mini-add">Add</button>
           </div>
           <div class="pick-info">
@@ -115,16 +115,16 @@
             <p>Rp 1.190.000</p>
           </div>
         </div>
-        <div class="pick-small">
+        <!-- <div class="pick-small">
           <div class="img-wrapper">
-            <img src="../public/IMG_PICK3.png" alt="Pick 3" />
+            <img src="../public/IMG5.png" alt="Pick 3" />
             <button class="btn-mini-add">Add</button>
           </div>
           <div class="pick-info">
             <h3>Diana Cashmere Cardigan</h3>
             <p>Rp 2.490.000</p>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -137,11 +137,11 @@
 <script setup>
 // Contoh data untuk slider
 const newArrivals = [
-  { id: 1, name: "Diana Cashmere Dress", price: 2890000, image: "../public/IMG1.png" },
-  { id: 2, name: "Miyari Silk Blouse", price: 1190000, image: "../public/IMG_PROD2.png" },
-  { id: 3, name: "Diana Cashmere Cardigan", price: 2490000, image: "../public/IMG_PROD3.png" },
-  { id: 4, name: "Valerie Wool Coat", price: 3390000, image: "../public/IMG_PROD4.png" },
-  { id: 5, name: "Diana Merino Sweater", price: 1890000, image: "../public/IMG_PROD5.png" },
+  { id: 1, name: "Diana Cashmere Dress", price: 2890000, image: "/Katalog1.png" },
+  { id: 2, name: "Miyari Silk Blouse", price: 1190000, image: "/Katalog2.png" },
+  { id: 3, name: "Diana Cashmere Cardigan", price: 2490000, image: "../public/Katalog3.png" },
+  { id: 4, name: "Valerie Wool Coat", price: 3390000, image: "../public/Katalog4.png" },
+  { id: 5, name: "Diana Merino Sweater", price: 1890000, image: "../public/Katalog5.png" },
 ];
 </script>
 
@@ -535,6 +535,19 @@ const newArrivals = [
   color: white;
 }
 
+.section-header {
+  display: flex;
+  flex-direction: column; /* Menyusun teks secara vertikal */
+  align-items: center; /* Membuat konten berada di tengah secara horizontal */
+  justify-content: center;
+  text-align: center; /* Memastikan teks rata tengah */
+  margin-bottom: 40px; /* Jarak antara header dengan grid produk */
+}
+
+.serif-title {
+  font-size: 40px;
+  font-weight: 400;
+}
 /* RESPONSIVE */
 @media (max-width: 1024px) {
   .section-feature-split {

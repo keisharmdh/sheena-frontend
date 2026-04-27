@@ -194,10 +194,10 @@ const products = ref([
     category: "Vest", // Atau Tops sesuai tab
     // Gambar utama & tambahan
     images: [
-      "/img/product-1.jpg", // Gambar besar utama (seperti di visual)
-      "/img/product-1-thumb1.jpg",
-      "/img/product-1-thumb2.jpg",
-      "/img/product-1-thumb3.jpg",
+      "../public/IMG1.png", // Gambar besar utama (seperti di visual)
+      "../public/IMG2.png",
+      "../public/IMG3.png",
+      "../public/IMG4.png",
     ],
     onSale: false,
     // Deskripsi lengkap
