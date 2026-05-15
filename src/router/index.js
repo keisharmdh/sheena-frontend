@@ -114,7 +114,6 @@ const routes = [
         name: "Report",
         component: () => import("../views/admin/Report.vue"),
       },
-      // Halaman admin lainnya di sini...
     ],
   },
 ];
@@ -132,11 +131,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   const token = localStorage.getItem("admin_token");
 
-  if (
-    to.path.startsWith("/admin") &&
-    to.path !== "/admin/login" &&
-    !token
-  ) {
+  if (to.path.startsWith("/admin") && to.path !== "/admin/login" && !token) {
     return "/admin/login";
   }
 });
