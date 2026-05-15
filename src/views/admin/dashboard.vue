@@ -7,28 +7,19 @@
       </div>
 
       <div class="sync-area">
-  <div class="sync-buttons">
-    <button
-      class="connect-btn"
-      @click="connectShopee"
-    >
-      Connect Shopee
-    </button>
+        <div class="sync-buttons">
+          <button class="connect-btn" @click="connectShopee">Connect Shopee</button>
 
-    <button
-      class="sync-btn"
-      @click="syncShopeeData"
-      :disabled="isSyncing"
-    >
-      {{ isSyncing ? "Syncing..." : "Sync Shopee Data" }}
-    </button>
-  </div>
+          <button class="sync-btn" @click="syncShopeeData" :disabled="isSyncing">
+            {{ isSyncing ? "Syncing..." : "Sync Shopee Data" }}
+          </button>
+        </div>
 
-  <p v-if="syncMessage" class="sync-message">
-    {{ syncMessage }}
-  </p>
-</div>
-  </header>
+        <p v-if="syncMessage" class="sync-message">
+          {{ syncMessage }}
+        </p>
+      </div>
+    </header>
 
     <div class="stats-grid">
       <div v-for="stat in mainStats" :key="stat.label" class="stat-card">
@@ -72,34 +63,26 @@
               <td class="text-center">
                 <span class="collection-tag">{{ item.collection }}</span>
               </td>
-              <td
-              class="text-right"
-              :class="item.stock < 10 ? 'text-red' : 'text-emerald'"
-            >
-              {{ item.stock }} products
-            </td>
+              <td class="text-right" :class="item.stock < 10 ? 'text-red' : 'text-emerald'">
+                {{ item.stock }} products
+              </td>
             </tr>
           </tbody>
         </table>
         <div class="pagination">
-  <button
-    @click="currentProductPage--"
-    :disabled="currentProductPage === 1"
-  >
-    Prev
-  </button>
+          <button @click="currentProductPage--" :disabled="currentProductPage === 1">Prev</button>
 
-  <span class="pagination-text">
-  Page {{ currentProductPage }} of {{ totalProductPages }}
-</span>
+          <span class="pagination-text">
+            Page {{ currentProductPage }} of {{ totalProductPages }}
+          </span>
 
-  <button
-    @click="currentProductPage++"
-    :disabled="currentProductPage === totalProductPages"
-  >
-    Next
-  </button>
-</div>
+          <button
+            @click="currentProductPage++"
+            :disabled="currentProductPage === totalProductPages"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </section>
 
@@ -202,10 +185,7 @@ const fetchSummary = async () => {
 };
 
 const cleanProductName = (name) => {
-  return name
-    ?.replace("Meet The Sheena - ", "")
-    ?.replace("Meet The Sheena — ", "")
-    ?.trim();
+  return name?.replace("Meet The Sheena - ", "")?.replace("Meet The Sheena — ", "")?.trim();
 };
 
 const getCollectionName = (name) => {
@@ -268,28 +248,25 @@ const fetchProducts = async () => {
     const result = await response.json();
     console.log("Products result:", result);
 
-    const productList = Array.isArray(result.data)
-      ? result.data
-      : result.data?.data || [];
+    const productList = Array.isArray(result.data) ? result.data : result.data?.data || [];
 
     products.value = productList.map((product) => {
-  const listings = product.product_listings || [];
+      const listings = product.product_listings || [];
 
-  const validPriceListing =
-    listings.find((item) => Number(item.price) > 0) || listings[0];
+      const validPriceListing = listings.find((item) => Number(item.price) > 0) || listings[0];
 
-  const totalStock = listings.reduce((sum, item) => {
-    return sum + Number(item.stock || 0);
-  }, 0);
+      const totalStock = listings.reduce((sum, item) => {
+        return sum + Number(item.stock || 0);
+      }, 0);
 
-  return {
-    name: cleanProductName(product.product_name),
-    price: Number(validPriceListing?.price || 0),
-    collection: getCollectionName(product.product_name),
-    stock: totalStock,
-    image: product.product_image || "https://placehold.co/100x120?text=Sheena",
-  };
-});
+      return {
+        name: cleanProductName(product.product_name),
+        price: Number(validPriceListing?.price || 0),
+        collection: getCollectionName(product.product_name),
+        stock: totalStock,
+        image: product.product_image || "https://placehold.co/100x120?text=Sheena",
+      };
+    });
   } catch (error) {
     console.error("Fetch products error:", error);
   }
@@ -323,14 +300,11 @@ const bestSellers = ref([]);
 
 const fetchBestSellers = async () => {
   try {
-    const response = await fetch(
-      `${API_BASE}/admin/dashboard/best-selling`,
-      {
-        headers: {
-          Accept: "application/json",
-        },
-      }
-    );
+    const response = await fetch(`${API_BASE}/admin/dashboard/best-selling`, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
 
     const result = await response.json();
 
@@ -338,9 +312,7 @@ const fetchBestSellers = async () => {
       name: cleanProductName(item.product_name),
       price: Number(item.avg_price),
       sold: Number(item.total_sold),
-      image:
-        item.product_image ||
-        "https://placehold.co/100x120?text=Sheena",
+      image: item.product_image || "https://placehold.co/100x120?text=Sheena",
     }));
 
     console.log("Best sellers:", bestSellers.value);
