@@ -43,9 +43,8 @@
         </div>
 
         <p v-if="errorMessage" class="error-message">
-  {{ errorMessage }}
-</p>
-
+          {{ errorMessage }}
+        </p>
 
         <button type="submit" class="btn-login" :disabled="isLoading">
           {{ isLoading ? "Logging in..." : "Login" }}
@@ -65,11 +64,9 @@ const isLoading = ref(false);
 const errorMessage = ref("");
 const router = useRouter();
 
-
 const handleLogin = async () => {
   isLoading.value = true;
   errorMessage.value = "";
-  
 
   try {
     const response = await fetch(
@@ -84,7 +81,7 @@ const handleLogin = async () => {
           email: email.value,
           password: password.value,
         }),
-      }
+      },
     );
 
     const result = await response.json();
@@ -195,8 +192,6 @@ const handleLogin = async () => {
   color: #1a1a1a;
 }
 
-
-
 .input-group input:focus {
   border-color: #8c6a43;
 }
@@ -229,8 +224,6 @@ const handleLogin = async () => {
   box-sizing: border-box;
 }
 
-
-
 .input-group label {
   display: block;
   font-size: 13px;
@@ -238,7 +231,6 @@ const handleLogin = async () => {
   color: #1a1a1a;
   margin-bottom: 8px;
 }
-
 
 .input-group input:focus {
   border-color: #8c6a43;
