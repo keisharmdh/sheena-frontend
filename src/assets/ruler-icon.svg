@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" 
+     width="24" 
+     height="24" 
+     viewBox="0 0 24 24" 
+     fill="none"
+     stroke="#8c6a43" 
+     stroke-width="1.8" 
+     stroke-linecap="round" 
+     stroke-linejoin="round">
+
+  <!-- tape body -->
+  <path d="M7 4H17C19.7614 4 22 6.23858 22 9V15C22 17.7614 19.7614 20 17 20H7C4.23858 20 2 17.7614 2 15V9C2 6.23858 4.23858 4 7 4Z"/>
+
+  <!-- measuring lines -->
+  <path d="M7 8V11"/>
+  <path d="M10 8V10"/>
+  <path d="M13 8V11"/>
+  <path d="M16 8V10"/>
+  <path d="M19 8V11"/>
+
+  <!-- roll circle -->
+  <circle cx="8" cy="15" r="2"/>
+</svg>

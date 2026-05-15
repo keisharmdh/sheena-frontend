@@ -10,13 +10,13 @@
     <section class="stats-grid">
       <div v-for="(stat, index) in topStats" :key="index" class="stat-card">
         <div class="stat-icon-box">
-          <span class="stat-icon">{{ stat.icon }}</span>
+          <component :is="stat.icon" class="stat-icon" />
         </div>
         <div class="stat-content">
           <h3 class="stat-value">{{ stat.value }}</h3>
           <p class="stat-label">{{ stat.label }}</p>
           <p class="stat-growth" :class="stat.trend">
-            {{ stat.growth }} <span class="trend-text">from last year</span>
+            {{ stat.growth }} <span class="trend-text">{{ stat.growthLabel }}</span>
           </p>
         </div>
       </div>
@@ -34,7 +34,7 @@
           <input type="date" class="admin-input" v-model="filter.endDate" />
         </div>
         <button class="btn-download" @click="handleDownload">
-          <span class="icon">📥</span> Download Report
+          <Download class="download-icon" /> Download Report
         </button>
       </div>
       <p class="helper-text">
@@ -43,7 +43,7 @@
     </section>
 
     <section class="recap-section admin-card">
-      <h2 class="serif-card-title">Monthly Sales Recap</h2>
+      <h2 class="serif-card-title">Sales Recap</h2>
       <div class="table-responsive">
         <table class="report-table">
           <thead>
@@ -55,17 +55,28 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(row, index) in monthlyData" :key="index">
-              <td class="month-cell">{{ row.month }}</td>
-              <td class="revenue-cell">{{ row.revenue }}</td>
-              <td class="orders-cell">{{ row.orders }} orders</td>
-              <td>
-                <span class="growth-badge" :class="row.growthType">
-                  {{ row.growthValue }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
+  <template v-for="report in salesReports" :key="report.month_key">
+    <tr class="month-row">
+      <td>{{ report.month }}</td>
+      <td>Rp {{ formatRupiah(report.total_revenue) }}</td>
+      <td>{{ report.total_orders }}</td>
+      <td :class="report.growth >= 0 ? 'growth-positive' : 'growth-negative'">
+        {{ report.growth === null ? "-" : `${report.growth >= 0 ? "+" : ""}${report.growth}%` }}
+      </td>
+    </tr>
+
+    <tr
+      v-for="order in report.orders"
+      :key="order.order_sn"
+      class="order-row"
+    >
+      <td>↳ {{ order.date }}</td>
+      <td>Rp {{ formatRupiah(order.total_amount) }}</td>
+      <td>{{ order.order_sn }}</td>
+      <td>{{ order.status }}</td>
+    </tr>
+  </template>
+</tbody>
         </table>
       </div>
     </section>
@@ -76,18 +87,117 @@
         detailed transaction information, please refer to your Shopee seller center.
       </p>
     </footer>
+    <transition name="toast">
+  <div v-if="showToast" class="custom-toast">
+    <span class="toast-icon">✓</span>
+    <span>{{ toastMessage }}</span>
+    <button @click="showToast = false">×</button>
+  </div>
+</transition>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, onMounted, computed, reactive } from "vue";
+import {
+  ShoppingBag,
+  Wallet,
+  Calculator,
+  Download
+} from "lucide-vue-next";
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
+
+const salesSummary = ref({
+  total_orders: 0,
+  total_items_sold: 0,
+  total_revenue: 0,
+});
+
+const salesReports = ref([]);
+const toastMessage = ref("");
+const showToast = ref(false);
+
+const triggerToast = (message) => {
+  toastMessage.value = message;
+  showToast.value = true;
+
+  setTimeout(() => {
+    showToast.value = false;
+  }, 2500);
+};
+
+const formatRupiah = (value) => {
+  return Number(value || 0).toLocaleString("id-ID");
+};
+
+const fetchSalesSummary = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/admin/sales`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+      },
+    });
+
+    const result = await response.json();
+
+    salesSummary.value = result.data;
+  } catch (error) {
+    console.error("Fetch sales summary error:", error);
+  }
+};
+
+const fetchSalesReports = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/admin/reports/sales`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+      },
+    });
+
+    const result = await response.json();
+
+    salesReports.value = result.data || [];
+  } catch (error) {
+    console.error("Fetch sales reports error:", error);
+  }
+};
 
 // Top Statistics Data
-const topStats = ref([
-  { icon: "$", label: "Total Revenue", value: "Rp 2,605,490", growth: "+23.4%", trend: "positive" },
-  { icon: "📈", label: "Total Orders", value: "1677", growth: "+18.2%", trend: "positive" },
-  { icon: "📅", label: "Avg. Order Value", value: "Rp 1,554", growth: "+4.3%", trend: "positive" },
-]);
+const topStats = computed(() => {
+  const totalRevenue = Number(salesSummary.value.total_revenue || 0);
+  const totalOrders = Number(salesSummary.value.total_orders || 0);
+  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+  return [
+  {
+    icon: Wallet,
+    label: "Total Revenue",
+    value: `Rp ${formatRupiah(totalRevenue)}`,
+    growth: `${salesSummary.value.revenue_growth >= 0 ? "+" : ""}${salesSummary.value.revenue_growth || 0}%`,
+    growthLabel: salesSummary.value.growth_label || "vs previous month",
+    trend: Number(salesSummary.value.revenue_growth) >= 0 ? "positive" : "negative",
+  },
+  {
+    icon: ShoppingBag,
+    label: "Total Orders",
+    value: totalOrders,
+    growth: `${salesSummary.value.orders_growth >= 0 ? "+" : ""}${salesSummary.value.orders_growth || 0}%`,
+    growthLabel: salesSummary.value.growth_label || "vs previous month",
+    trend: Number(salesSummary.value.orders_growth) >= 0 ? "positive" : "negative",
+  },
+  {
+    icon: Calculator,
+    label: "Avg. Order Value",
+    value: `Rp ${formatRupiah(avgOrderValue)}`,
+    growth: `${salesSummary.value.avg_order_growth >= 0 ? "+" : ""}${salesSummary.value.avg_order_growth || 0}%`,
+    growthLabel: salesSummary.value.growth_label || "vs previous month",
+    trend: Number(salesSummary.value.avg_order_growth) >= 0 ? "positive" : "negative",
+  },
+];
+});
 
 // Download Filter
 const filter = reactive({
@@ -184,9 +294,68 @@ const monthlyData = ref([
 ]);
 
 const handleDownload = () => {
-  console.log("Downloading report for:", filter.startDate, "to", filter.endDate);
-  alert("Report download started...");
+  let orderRows = [];
+
+  salesReports.value.forEach((month) => {
+    (month.orders || []).forEach((order) => {
+      orderRows.push({
+        month: month.month,
+        date: order.date,
+        order_sn: order.order_sn,
+        status: order.status,
+        total_amount: order.total_amount,
+      });
+    });
+  });
+
+  if (filter.startDate) {
+    orderRows = orderRows.filter((item) => item.date >= filter.startDate);
+  }
+
+  if (filter.endDate) {
+    orderRows = orderRows.filter((item) => item.date <= filter.endDate);
+  }
+
+  if (!orderRows.length) {
+    triggerToast("Tidak ada data pada rentang tanggal tersebut.");
+    return;
+  }
+
+  const rows = [
+    ["Month", "Date", "Order SN", "Status", "Revenue"],
+    ...orderRows.map((item) => [
+      item.month,
+      item.date,
+      item.order_sn,
+      item.status,
+      item.total_amount,
+    ]),
+  ];
+
+  const csvContent = rows
+    .map((row) => row.map((value) => `"${value ?? ""}"`).join(","))
+    .join("\n");
+
+  const blob = new Blob([csvContent], {
+    type: "text/csv;charset=utf-8;",
+  });
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = `sales-report-${filter.startDate || "all"}-${filter.endDate || "all"}.csv`;
+  link.click();
+
+  URL.revokeObjectURL(url);
+
+  triggerToast("Sales report downloaded successfully!");
 };
+
+onMounted(() => {
+  fetchSalesSummary();
+  fetchSalesReports();
+});
 </script>
 
 <style scoped>
@@ -274,6 +443,7 @@ const handleDownload = () => {
 .stat-growth.positive {
   color: #27ae60;
 }
+
 .trend-text {
   color: #bbb;
   font-weight: 400;
@@ -378,6 +548,16 @@ const handleDownload = () => {
   color: #999;
 }
 
+.growth-positive {
+  color: #27ae60;
+  font-weight: 700;
+}
+
+.growth-negative {
+  color: #eb5757;
+  font-weight: 700;
+}
+
 /* Badges */
 .growth-badge {
   display: inline-block;
@@ -405,5 +585,91 @@ const handleDownload = () => {
   font-size: 12px;
   color: #7a8ba3;
   line-height: 1.6;
+}
+
+.stat-icon {
+  width: 22px;
+  height: 22px;
+  color: #8c6a43;
+}
+
+.download-icon {
+  width: 18px;
+  height: 18px;
+  color: white;
+}
+
+.stat-growth.negative {
+  color: #eb5757;
+}
+
+.month-row td {
+  font-weight: 700;
+  background: #fbfbfb;
+  color: #1a1a1a;
+}
+
+.order-row td {
+  font-size: 12px;
+  color: #888;
+  padding-left: 24px;
+}
+
+.custom-toast {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  z-index: 9999;
+  min-width: 380px;
+  background: white;
+  border: 1px solid #eee;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  font-family: "FONTSPRING DEMO - The Seasons";
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid #8c6a43;
+  color: #8c6a43;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.custom-toast button {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.25s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.month-row td.growth-positive {
+  color: #27ae60;
+}
+
+.month-row td.growth-negative {
+  color: #eb5757;
 }
 </style>

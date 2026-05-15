@@ -1,8 +1,8 @@
 <template>
   <div class="shop-page">
     <header class="shop-header">
-      <span class="label">EXPLORE</span>
-      <h1 class="serif-title">Shop Collection</h1>
+      <span class="label">{{ shopContent.shop_label || "EXPLORE" }}</span>
+      <h1 class="serif-title">{{ shopContent.shop_title || "Shop Collection" }}</h1>
       <p class="product-count">{{ filteredProducts.length }} Items</p>
 
       <div class="category-tabs">
@@ -109,13 +109,14 @@
         v-for="product in sortedProducts"
         :key="product.id"
         class="product-card"
-        @click="goToDetail(product.id)"
       >
-        <div class="image-container">
+        <div class="image-container" @click="openQuickView(product)">
           <img :src="product.image" :alt="product.name" />
           <button class="btn-quick-view" @click.stop="openQuickView(product)">Quick View</button>
           <span v-if="product.onSale" class="sale-tag">SALE</span>
-          <button class="add-to-bag-btn">+</button>
+          <button class="add-to-bag-btn" @click.stop="openQuickView(product)">
+            +
+          </button>
         </div>
         <div class="product-info">
           <h3>{{ product.name }}</h3>
@@ -154,133 +155,124 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import FilterPopup from "../../components/FilterPopup.vue";
 import SortPopup from "../../components/SortPopup.vue";
 import QuickView from "../../components/QuickViewPopup.vue";
 
-// States untuk UI
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
+
+const router = useRouter();
+
 const gridCols = ref(2);
 const isFilterOpen = ref(false);
 const isSortOpen = ref(false);
-const viewMode = ref("grid");
 const isQuickViewOpen = ref(false);
 const selectedProduct = ref(null);
 
-const openQuickView = (product) => {
-  selectedProduct.value = product;
-  isQuickViewOpen.value = true;
-};
-
-const goToDetail = (productId) => {
-  // Logika untuk pindah ke halaman detail produk
-  router.push({ name: "ProductDetail", params: { id: productId } });
-};
-
-// States untuk Data
 const sortBy = ref("featured");
 const activeCategory = ref("All");
 const activeCollection = ref("All");
 
 const categories = ["All", "New", "Vest", "Tops", "Jacket"];
+const products = ref([]);
 
-// DATA PRODUK (Pastikan ini tidak kosong)
-const products = ref([
-  {
-    id: 1,
-    name: "Diana Cashmere Dress",
-    collection: "NEW COLLECTION",
-    price: 2890000,
-    category: "Vest", // Atau Tops sesuai tab
-    // Gambar utama & tambahan
-    images: [
-      "../public/IMG1.png", // Gambar besar utama (seperti di visual)
-      "../public/IMG2.png",
-      "../public/IMG3.png",
-      "../public/IMG4.png",
-    ],
-    onSale: false,
-    // Deskripsi lengkap
-    desc: "An exquisite cashmere dress that embodies understated luxury. Crafted from the finest cashmere, this piece drapes beautifully and offers unparalleled softness. The minimalist silhouette ensures versatility for both day and evening wear.",
-    // Atribut tambahan
-    material: "100% Premium Cashmere",
-    details: ["Relaxed fit", "Midi length", "Side pockets"],
-  },
-  {
-    id: 2,
-    name: "Diana Cashmere Dress",
-    collection: "NEW COLLECTION",
-    price: 2890000,
-    category: "Vest", // Atau Tops sesuai tab
-    // Gambar utama & tambahan
-    images: [
-      "/img/product-1.jpg", // Gambar besar utama (seperti di visual)
-      "/img/product-1-thumb1.jpg",
-      "/img/product-1-thumb2.jpg",
-      "/img/product-1-thumb3.jpg",
-    ],
-    onSale: false,
-    // Deskripsi lengkap
-    desc: "An exquisite cashmere dress that embodies understated luxury. Crafted from the finest cashmere, this piece drapes beautifully and offers unparalleled softness. The minimalist silhouette ensures versatility for both day and evening wear.",
-    // Atribut tambahan
-    material: "100% Premium Cashmere",
-    details: ["Relaxed fit", "Midi length", "Side pockets"],
-  },
-  {
-    id: 3,
-    name: "Diana Cashmere Dress",
-    collection: "NEW COLLECTION",
-    price: 2890000,
-    category: "Vest", // Atau Tops sesuai tab
-    // Gambar utama & tambahan
-    images: [
-      "/img/product-1.jpg", // Gambar besar utama (seperti di visual)
-      "/img/product-1-thumb1.jpg",
-      "/img/product-1-thumb2.jpg",
-      "/img/product-1-thumb3.jpg",
-    ],
-    onSale: false,
-    // Deskripsi lengkap
-    desc: "An exquisite cashmere dress that embodies understated luxury. Crafted from the finest cashmere, this piece drapes beautifully and offers unparalleled softness. The minimalist silhouette ensures versatility for both day and evening wear.",
-    // Atribut tambahan
-    material: "100% Premium Cashmere",
-    details: ["Relaxed fit", "Midi length", "Side pockets"],
-  },
-  {
-    id: 4,
-    name: "Diana Cashmere Dress",
-    collection: "NEW COLLECTION",
-    price: 2890000,
-    category: "Vest", // Atau Tops sesuai tab
-    // Gambar utama & tambahan
-    images: [
-      "/img/product-1.jpg", // Gambar besar utama (seperti di visual)
-      "/img/product-1-thumb1.jpg",
-      "/img/product-1-thumb2.jpg",
-      "/img/product-1-thumb3.jpg",
-    ],
-    onSale: false,
-    // Deskripsi lengkap
-    desc: "An exquisite cashmere dress that embodies understated luxury. Crafted from the finest cashmere, this piece drapes beautifully and offers unparalleled softness. The minimalist silhouette ensures versatility for both day and evening wear.",
-    // Atribut tambahan
-    material: "100% Premium Cashmere",
-    details: ["Relaxed fit", "Midi length", "Side pockets"],
-  },
-]);
+const cleanProductName = (name) => {
+  return name?.replace(/Meet The Sheena\s*[-—]?\s*/gi, "").trim() || "";
+};
 
-// 1. Logic Filter berdasarkan Kategori & Koleksi
+const getProductCategories = (name) => {
+  const lower = (name || "").toLowerCase();
+  const cats = ["New"];
+
+  if (lower.includes("vest")) cats.push("Vest");
+  if (lower.includes("top") || lower.includes("blouse")) cats.push("Tops");
+  if (lower.includes("jacket") || lower.includes("outer")) cats.push("Jacket");
+
+  return cats;
+};
+const getCollectionName = (name) => {
+  const lower = (name || "").toLowerCase();
+
+  if (lower.includes("miyari")) return "Miyari";
+  if (lower.includes("myza")) return "MYZA";
+  if (lower.includes("diana")) return "Diana";
+  if (lower.includes("valerie")) return "Valerie";
+
+  return "Others";
+};
+
+const fetchProducts = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/products`, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    const result = await response.json();
+
+    const productList = Array.isArray(result.data)
+      ? result.data
+      : result.data?.data || [];
+
+    products.value = productList.map((product) => {
+      const listings = product.product_listings || [];
+
+      const validPriceListing =
+        listings.find((item) => Number(item.price) > 0) || listings[0];
+
+      const totalStock = listings.reduce((sum, item) => {
+        return sum + Number(item.stock || 0);
+      }, 0);
+
+      return {
+  id: product.id_product,
+  name: cleanProductName(product.product_name),
+  collection: getCollectionName(product.product_name),
+  price: Number(validPriceListing?.price || 0),
+  categories: getProductCategories(product.product_name),
+  image: product.product_image || "https://placehold.co/500x650?text=Sheena",
+  images: [product.product_image || "https://placehold.co/500x650?text=Sheena"],
+  stock: totalStock,
+  variants: listings.map((item) => ({
+  id: item.id_listing,
+  name: item.variant_name,
+  price: Number(item.price || 0),
+  stock: Number(item.stock || 0),
+  url: item.product_url,
+})),
+
+shopeeUrl: validPriceListing?.product_url || listings[0]?.product_url || "",
+  onSale: false,
+  oldPrice: null,
+  desc: "Product data is synced from Shopee.",
+  material: "-",
+  details: [],
+};
+    });
+  } catch (error) {
+    console.error("Fetch shop products error:", error);
+  }
+};
+
 const filteredProducts = computed(() => {
   return products.value.filter((p) => {
-    const categoryMatch = activeCategory.value === "All" || p.category === activeCategory.value;
+    const categoryMatch =
+      activeCategory.value === "All" ||
+      p.categories.includes(activeCategory.value);
+
     const collectionMatch =
       activeCollection.value === "All" || p.collection === activeCollection.value;
+
     return categoryMatch && collectionMatch;
   });
 });
 
-// 2. Logic Sorting (Ini yang dipanggil di v-for)
 const sortedProducts = computed(() => {
-  let list = [...filteredProducts.value];
+  const list = [...filteredProducts.value];
+
   if (sortBy.value === "low-high") {
     list.sort((a, b) => a.price - b.price);
   } else if (sortBy.value === "high-low") {
@@ -288,10 +280,43 @@ const sortedProducts = computed(() => {
   } else if (sortBy.value === "newest") {
     list.reverse();
   }
+
   return list;
 });
 
-const formatPrice = (val) => `Rp ${val.toLocaleString("id-ID")}`;
+const sortByLabel = computed(() => {
+  if (sortBy.value === "low-high") return "LOW-HIGH";
+  if (sortBy.value === "high-low") return "HIGH-LOW";
+  if (sortBy.value === "newest") return "NEWEST";
+  return "";
+});
+
+const formatPrice = (val) => `Rp ${Number(val || 0).toLocaleString("id-ID")}`;
+
+const openQuickView = (product) => {
+  selectedProduct.value = product;
+  isQuickViewOpen.value = true;
+};
+
+const goToDetail = (productId) => {
+  router.push({ name: "ProductDetail", params: { id: productId } });
+};
+
+const shopContent = ref({});
+
+const fetchShopContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    headers: { Accept: "application/json" },
+  });
+
+  const result = await response.json();
+  shopContent.value = result.data || {};
+};
+
+onMounted(() => {
+  fetchProducts();
+  fetchShopContent();
+});
 </script>
 
 <style scoped>

@@ -17,20 +17,27 @@
 
       <!-- RIGHT -->
       <div class="right">
-        <img
-          src="../assets/Search.svg"
-          class="icon"
-          @click="isSearchOpen = true"
-          style="cursor: pointer"
-          ;
-        />
-        <img
-          src="../assets/ShoppingBag.svg"
-          class="icon"
-          @click="isBagOpen = true"
-          style="cursor: pointer"
-          ;
-        />
+        <!--
+<img
+  src="../assets/Search.svg"
+  class="icon"
+  @click="isSearchOpen = true"
+  style="cursor: pointer"
+/>
+-->
+        <div class="bag-wrapper" @click="isBagOpen = true">
+  <img
+    src="../assets/ShoppingBag.svg"
+    class="icon"
+  />
+
+  <span
+    v-if="cart.totalItems > 0"
+    class="bag-count"
+  >
+    {{ cart.totalItems }}
+  </span>
+</div>
       </div>
       <search-popup :is-open="isSearchOpen" @close="isSearchOpen = false" />
       <shopping-bag-popup :is-open="isBagOpen" @close="isBagOpen = false" />
@@ -42,9 +49,12 @@
 import { ref, onMounted, onUnmounted } from "vue";
 import ShoppingBagPopup from "./ShoppingBagPopup.vue";
 import SearchPopup from "./SearchPopup.vue";
+import { useCartStore } from "../stores/cart.js";
 
 const isSearchOpen = ref(false);
 const isBagOpen = ref(false);
+
+const cart = useCartStore();
 
 const showSearch = ref(false);
 const showCart = ref(false);
@@ -94,14 +104,28 @@ onUnmounted(() => {
 
 /* CONTAINER (INI YANG NGATUR MARGIN KIRI-KANAN) */
 .container {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
 
   max-width: 1600px;
   margin: 0 auto;
   padding: 0 40px;
   height: 80px;
+}
+
+.left {
+  justify-self: start;
+}
+
+.center {
+  justify-self: center;
+}
+
+.right {
+  justify-self: end;
+  display: flex;
+  gap: 70px;
 }
 
 /* LOGO */
@@ -157,5 +181,43 @@ onUnmounted(() => {
   padding: 20px;
   border: 1px solid #ddd;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.bag-wrapper {
+  position: relative;
+  cursor: pointer;
+}
+
+.bag-count {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+
+  background: #8c6a43;
+  color: white;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.5);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 </style>

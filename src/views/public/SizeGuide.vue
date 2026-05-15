@@ -1,11 +1,17 @@
 <template>
   <div class="guide-container">
-    <div class="back-nav" @click="$router.back()"><span>‹</span> Back to Help</div>
+    <div class="back-nav" @click="$router.back()"><span>‹</span> Back </div>
 
     <header class="guide-header">
-      <span class="label">FIND YOUR FIT</span>
-      <h1 class="serif-title">Size Guide</h1>
-      <p class="sub-desc">Use our detailed size charts to find your perfect fit</p>
+      <span class="label">{{ content.size_label || "FIND YOUR FIT" }}</span>
+
+<h1 class="serif-title">
+  {{ content.size_title || "Size Guide" }}
+</h1>
+
+<p class="sub-desc">
+  {{ content.size_description || "Use our detailed size charts to find your perfect fit" }}
+</p>
     </header>
 
     <section class="measure-section">
@@ -13,7 +19,7 @@
       <div class="measure-grid">
         <div class="measure-box" v-for="item in measureSteps" :key="item.title">
           <div class="icon-circle">
-            <img src="../../assets/ruler-icon.svg" alt="icon" class="ruler-icon" />
+            <img :src="rulerIcon" alt="icon" class="ruler-icon" />
           </div>
           <p class="measure-name">{{ item.title }}</p>
           <p class="measure-text">{{ item.desc }}</p>
@@ -84,7 +90,14 @@
 </template>
 
 <script setup>
-const measureSteps = [
+import { ref, onMounted } from "vue";
+import rulerIcon from "../../assets/ruler-icon.svg";
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
+
+const content = ref({});
+
+const measureSteps = ref([
   {
     title: "BUST",
     desc: "Measure around the fullest part of your bust, keeping the tape parallel to the floor.",
@@ -97,13 +110,13 @@ const measureSteps = [
     title: "HIPS",
     desc: "Measure around the fullest part of your hips, approximately 20cm below your waist.",
   },
-];
+]);
 
-const topsData = [
+const topsData = ref([
   { size: "S", length: "53", sleeve: "63", bust: "94" },
   { size: "M", length: "54", sleeve: "63", bust: "98" },
   { size: "L", length: "55", sleeve: "64", bust: "102" },
-];
+]);
 
 const jacketData = [
   { size: "XS", bust: "81-84", waist: "63-66", hips: "89-92" },
@@ -112,6 +125,28 @@ const jacketData = [
   { size: "L", bust: "96-99", waist: "78-81", hips: "104-107" },
   { size: "XL", bust: "101-104", waist: "83-86", hips: "109-112" },
 ];
+
+const fetchContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const result = await response.json();
+  content.value = result.data || {};
+
+  if (content.value.size_measure_steps) {
+  measureSteps.value = JSON.parse(content.value.size_measure_steps);
+}
+
+
+  if (content.value.size_tops_table) {
+    topsData.value = JSON.parse(content.value.size_tops_table);
+  }
+};
+
+onMounted(fetchContent);
 </script>
 
 <style scoped>

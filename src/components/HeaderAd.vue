@@ -17,45 +17,18 @@
       </button>
     </div>
 
-    <div class="header-center">
-      <div class="search-bar">
-        <span class="search-icon">
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#ccc"
-            stroke-width="2"
-          >
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-        </span>
-        <input type="text" placeholder="Search..." />
-      </div>
-    </div>
+    <div class="header-center"></div>
 
     <div class="header-right">
-      <div class="notification-wrapper">
-        <button class="icon-btn">
-          <svg
-            width="22"
-            height="22"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="#666"
-            stroke-width="2"
-          >
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-        </button>
-        <span class="notification-badge"></span>
+      <div class="search-box">
       </div>
 
       <div class="profile-dropdown">
-        <div class="avatar-circle">
+        <div class="profile-info">
+          <p class="admin-name">{{ adminName }}</p>
+          <p class="admin-email">{{ adminEmail }}</p>
+        </div>
+          <div class="avatar-circle">
           <svg
             width="20"
             height="20"
@@ -68,7 +41,7 @@
             <circle cx="12" cy="7" r="4"></circle>
           </svg>
         </div>
-        <span class="arrow-down">
+        <!-- <span class="arrow-down">
           <svg
             width="14"
             height="14"
@@ -79,14 +52,21 @@
           >
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-        </span>
+        </span> -->
       </div>
     </div>
   </header>
 </template>
 
 <script setup>
+import { computed } from "vue";
+
 defineEmits(["toggle-sidebar"]);
+
+const adminUser = JSON.parse(localStorage.getItem("admin_user") || "{}");
+
+const adminName = computed(() => adminUser.name || "Admin");
+const adminEmail = computed(() => adminUser.email || "");
 </script>
 
 <style scoped>
@@ -178,7 +158,7 @@ defineEmits(["toggle-sidebar"]);
   display: flex;
   align-items: center;
   gap: 8px;
-  cursor: pointer;
+  cursor: default;
 }
 .avatar-circle {
   width: 38px;
@@ -192,5 +172,22 @@ defineEmits(["toggle-sidebar"]);
 .arrow-down {
   display: flex;
   align-items: center;
+}
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  text-align: right;
+}
+.admin-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0;
+}
+.admin-email {
+  font-size: 12px;
+  color: #999;
+  margin: 0;
 }
 </style>

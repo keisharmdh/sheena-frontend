@@ -128,4 +128,17 @@ const router = createRouter({
   },
 });
 
+// ROUTE GUARD
+router.beforeEach((to) => {
+  const token = localStorage.getItem("admin_token");
+
+  if (
+    to.path.startsWith("/admin") &&
+    to.path !== "/admin/login" &&
+    !token
+  ) {
+    return "/admin/login";
+  }
+});
+
 export default router;

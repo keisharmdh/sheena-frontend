@@ -5,7 +5,10 @@
         <h1 class="serif-title">Manage Content</h1>
         <p class="subtitle">Update website content, text, and images</p>
       </div>
-      <button class="btn-edit-data"><span class="edit-icon">✎</span> Edit Data</button>
+      <button class="btn-edit-data" @click="saveContent">
+        <Save class="save-icon" />
+  Save Data
+      </button>
     </header>
 
     <div class="manage-stack">
@@ -14,11 +17,11 @@
         <div class="form-row">
           <div class="form-group">
             <label>Title</label>
-            <input type="text" class="admin-input" placeholder="Enter about title" />
+            <input v-model="form.about_title" type="text" class="admin-input" placeholder="Enter about title" />
           </div>
           <div class="form-group">
             <label>Subtitle</label>
-            <input type="text" class="admin-input" placeholder="Enter about subtitle" />
+            <input v-model="form.about_subtitle" type="text" class="admin-input" placeholder="Enter about subtitle" />
           </div>
         </div>
       </section>
@@ -28,11 +31,11 @@
         <div class="form-group">
           <label>Brand Story Content</label>
           <textarea
-            v-model="brandStory"
+            v-model="form.about_story"
             class="admin-textarea brand-story-area"
             placeholder="Write your brand story here..."
           ></textarea>
-          <p class="char-count">{{ brandStory.length }} characters</p>
+          <p class="char-count">{{ form.about_story.length }} characters</p>
         </div>
       </section>
     </div>
@@ -44,13 +47,73 @@
       </p>
     </footer>
   </div>
+
+  <transition name="toast">
+  <div v-if="showToast" class="custom-toast">
+    <span class="toast-icon">✓</span>
+
+    <span>{{ toastMessage }}</span>
+
+    <button @click="showToast = false">×</button>
+  </div>
+</transition>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { Save } from "lucide-vue-next";
 
-// Menginisialisasi dengan jumlah karakter contoh sesuai gambar
-const brandStory = ref("Brand story content example text...");
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
+
+const form = ref({
+  about_title: "About SHEENA",
+  about_subtitle: "OUR STORY",
+  about_story: "Brand story content example text...",
+});
+
+const fetchContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    headers: { Accept: "application/json" },
+  });
+
+  const result = await response.json();
+
+  form.value = {
+    ...form.value,
+    ...(result.data || {}),
+  };
+};
+
+const toastMessage = ref("");
+const showToast = ref(false);
+
+const triggerToast = (message) => {
+  toastMessage.value = message;
+  showToast.value = true;
+
+  setTimeout(() => {
+    showToast.value = false;
+  }, 2500);
+};
+
+const saveContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+    },
+    body: JSON.stringify(form.value),
+  });
+
+  const result = await response.json();
+  triggerToast("About content updated successfully");
+
+  await fetchContent();
+};
+
+onMounted(fetchContent);
 </script>
 
 <style scoped>
@@ -81,6 +144,11 @@ const brandStory = ref("Brand story content example text...");
   color: #999;
   font-size: 14px;
   margin-top: 4px;
+}
+
+.save-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .btn-edit-data {
@@ -177,5 +245,68 @@ const brandStory = ref("Brand story content example text...");
   font-size: 12px;
   color: #7a8ba3;
   line-height: 1.6;
+}
+
+.custom-toast {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  z-index: 9999;
+
+  min-width: 380px;
+
+  background: white;
+  border: 1px solid #eee;
+
+  padding: 18px 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  font-family: "FONTSPRING DEMO - The Seasons";
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+  border: 1px solid #8c6a43;
+
+  color: #8c6a43;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+}
+
+.custom-toast button {
+  margin-left: auto;
+
+  background: transparent;
+  border: none;
+
+  color: #bbb;
+
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.25s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

@@ -1,5 +1,34 @@
 <script setup lang="ts">
-import router from "../router";
+import { ref, onMounted } from "vue";
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
+
+const footerContent = ref<Record<string, string>>({});
+
+const defaultSocialLinks = [
+  { platform: "Instagram", url: "https://www.instagram.com/shnco___/" },
+  { platform: "Shopee", url: "https://shopee.co.id/shnco___" },
+  { platform: "Tiktok", url: "https://www.tiktok.com/@meetthesheena" },
+];
+
+const socialLinks = ref<{ platform: string; url: string }[]>(defaultSocialLinks);
+
+const fetchFooterContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const result = await response.json();
+  footerContent.value = result.data || {};
+
+  socialLinks.value = footerContent.value.footer_social_links
+    ? JSON.parse(footerContent.value.footer_social_links)
+    : defaultSocialLinks;
+};
+
+onMounted(fetchFooterContent);
 </script>
 
 <template>
@@ -7,19 +36,26 @@ import router from "../router";
     <div class="container">
       <!-- COL 1 -->
       <div class="col">
-        <p class="titlefooter">ABOUT SHEENA</p>
-        <p class="desc">
-          Crafting timeless elegance since 1985. Each piece tells a story of exceptional
-          craftsmanship and refined design.
-        </p>
+        <p class="titlefooter">
+  {{ footerContent.footer_about_title || "ABOUT SHEENA" }}
+</p>
+
+<p class="desc">
+  {{
+    footerContent.footer_about_desc ||
+    "Crafting timeless elegance since 1985. Each piece tells a story of exceptional craftsmanship and refined design."
+  }}
+</p>
       </div>
 
       <!-- COL 2 -->
       <div class="col">
         <p class="titlefooter">SHOP</p>
         <ul>
-          <li>New Arrival</li>
-          <li>Sale</li>
+          <router-link to="/#new-collection" class="footer-link">
+            New Arrival
+          </router-link>
+          <!-- <li>Sale</li> -->
         </ul>
       </div>
 
@@ -35,13 +71,15 @@ import router from "../router";
 
       <!-- COL 4 -->
       <div class="col">
-        <p class="titlefooter">FOLLOW</p>
-        <ul>
-          <li><a href="https://www.instagram.com/shnco___/" target="_blank">Instagram</a></li>
-          <li><a href="https://shopee.co.id/shnco___" target="_blank">Shopee</a></li>
-          <li><a href="https://www.tiktok.com/@meetthesheena" target="_blank">Tiktok</a></li>
-        </ul>
-      </div>
+  <p class="titlefooter">FOLLOW</p>
+  <ul>
+    <li v-for="social in socialLinks" :key="social.platform">
+      <a :href="social.url" target="_blank">
+        {{ social.platform }}
+      </a>
+    </li>
+  </ul>
+</div>
     </div>
 
     <!-- BOTTOM BAR -->
@@ -153,5 +191,16 @@ a:hover {
   .about {
     flex: 1;
   }
+}
+
+.footer-link {
+  color: #82603d;
+  font-family: "FONTSPRING DEMO - The Seasons";
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
 }
 </style>

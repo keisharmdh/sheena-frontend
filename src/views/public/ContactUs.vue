@@ -1,6 +1,6 @@
 <template>
   <div class="contact-container">
-    <div class="back-nav" @click="$router.back()"><span>‹</span> Back to Help</div>
+    <div class="back-nav" @click="$router.back()"><span>‹</span> Back </div>
 
     <header class="contact-header">
       <span class="label">GET IN TOUCH</span>
@@ -15,7 +15,10 @@
         <h2 class="section-title-serif">Contact Information</h2>
 
         <div class="info-items">
-          <a href="mailto:meetthesheena@gmail.com" class="info-item">
+          <a
+            :href="`mailto:${content.contact_email || 'meetthesheena@gmail.com'}`"
+            class="info-item"
+          >
             <div class="icon-circle">
               <svg
                 width="20"
@@ -33,12 +36,19 @@
             </div>
             <div class="item-text">
               <p class="item-label">EMAIL</p>
-              <p class="item-value">meetthesheena@gmail.com</p>
-              <p class="item-sub">Response within 24 hours</p>
+             <p class="item-value">
+  {{ content.contact_email || "meetthesheena@gmail.com" }}
+</p>
+<p class="item-sub">
+  {{ content.contact_email_note || "Response within 24 hours" }}
+</p>
             </div>
           </a>
 
-          <a href="tel:+6281311983690" class="info-item">
+          <a
+            :href="`tel:${content.contact_phone || '+6281311983690'}`"
+            class="info-item"
+          >
             <div class="icon-circle">
               <svg
                 width="20"
@@ -55,16 +65,20 @@
             </div>
             <div class="item-text">
               <p class="item-label">PHONE</p>
-              <p class="item-value">+62 81311983690</p>
-              <p class="item-sub">Mon-Fri, 9:00 AM - 6:00 PM (GMT+7)</p>
+              <p class="item-value">
+  {{ content.contact_phone || "+62 81311983690" }}
+</p>
+<p class="item-sub">
+  {{ content.contact_phone_note || "Mon-Fri, 9:00 AM - 6:00 PM (GMT+7)" }}
+</p>
             </div>
           </a>
 
           <a
-            href="https://www.google.com/maps/search/?api=1&query=123+Luxury+Lane+Jakarta+Indonesia"
-            target="_blank"
-            class="info-item"
-          >
+  :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((content.contact_address || '123 Luxury Lane') + ' ' + (content.contact_address_note || 'Jakarta, Indonesia'))}`"
+  target="_blank"
+  class="info-item"
+>
             <div class="icon-circle">
               <svg
                 width="20"
@@ -80,8 +94,12 @@
             </div>
             <div class="item-text">
               <p class="item-label">ADDRESS</p>
-              <p class="item-value">123 Luxury Lane</p>
-              <p class="item-sub">Jakarta, Indonesia</p>
+              <p class="item-value">
+  {{ content.contact_address || "123 Luxury Lane" }}
+</p>
+<p class="item-sub">
+  {{ content.contact_address_note || "Jakarta, Indonesia" }}
+</p>
             </div>
           </a>
         </div>
@@ -90,7 +108,7 @@
       <div class="form-column">
         <h2 class="section-title-serif">Send us a Message</h2>
 
-        <form @submit.prevent="submitToEmail" class="contact-form">
+        <form @submit.prevent="submitMessage" class="contact-form">
           <div class="form-group">
             <label>NAME *</label>
             <input v-model="formData.name" type="text" placeholder="Your name" required />
@@ -121,10 +139,21 @@
       </div>
     </div>
   </div>
+
+  <transition name="toast">
+  <div v-if="showToast" class="custom-toast">
+    <span class="toast-icon">✓</span>
+
+    <span>{{ toastMessage }}</span>
+
+    <button @click="showToast = false">×</button>
+  </div>
+</transition>
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
+
 
 const formData = reactive({
   name: "",
@@ -132,19 +161,41 @@ const formData = reactive({
   message: "",
 });
 
-const submitToEmail = () => {
-  // Format subjek dan body untuk email klien
-  const subject = encodeURIComponent(`Message from ${formData.name}`);
-  const body = encodeURIComponent(
-    `Name: ${formData.name}\n` + `Email: ${formData.email}\n\n` + `Message:\n${formData.message}`,
-  );
+const toastMessage = ref("");
+const showToast = ref(false);
 
-  // Membuka aplikasi email default user
-  window.location.href = `mailto:meetthesheena@gmail.com?subject=${subject}&body=${body}`;
+const triggerToast = (message) => {
+  toastMessage.value = message;
+  showToast.value = true;
 
-  // Opsional: Reset form setelah kirim
-  // formData.name = ''; formData.email = ''; formData.message = '';
+  setTimeout(() => {
+    showToast.value = false;
+  }, 2500);
 };
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
+
+const content = ref({});
+const fetchContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const result = await response.json();
+  content.value = result.data || {};
+};
+
+const submitMessage = () => {
+  triggerToast("Message sent successfully!");
+
+  formData.name = "";
+  formData.email = "";
+  formData.message = "";
+};
+
+onMounted(fetchContent);
 </script>
 
 <style scoped>
@@ -296,5 +347,68 @@ textarea:focus {
     grid-template-columns: 1fr;
     gap: 60px;
   }
+}
+
+.custom-toast {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  z-index: 9999;
+
+  min-width: 380px;
+
+  background: white;
+  border: 1px solid #eee;
+
+  padding: 18px 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  font-family: "FONTSPRING DEMO - The Seasons";
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+  border: 1px solid #8c6a43;
+
+  color: #8c6a43;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+}
+
+.custom-toast button {
+  margin-left: auto;
+
+  background: transparent;
+  border: none;
+
+  color: #bbb;
+
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.25s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

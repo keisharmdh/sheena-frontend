@@ -5,6 +5,7 @@
         <div class="cart-container">
           <div class="cart-header">
             <h2 class="title">Your Bag</h2>
+
             <button class="close-btn" @click="$emit('close')">
               <svg
                 width="20"
@@ -22,27 +23,101 @@
           <hr class="divider" />
 
           <div class="cart-content">
-            <div class="icon-circle">
-              <svg
-                width="40"
-                height="40"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#8c6a43"
-                stroke-width="1.2"
+            <template v-if="cart.isEmpty">
+              <div class="icon-circle">
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="#8c6a43"
+                  stroke-width="1.2"
+                >
+                  <path
+                    d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z"
+                  />
+                  <path d="M3 6h18M16 10a4 4 0 01-8 0" />
+                </svg>
+              </div>
+
+              <h3 class="empty-text">Your Bag is Empty</h3>
+
+              <p class="sub-text">
+                Looks like you haven't 
+                anything to your bag yet.
+              </p>
+
+              <div class="action-area">
+                <button
+                  class="btn-continue"
+                  @click="$emit('close')"
+                >
+                  Continue Shopping
+                </button>
+
+                <button
+                  class="btn-browse"
+                  @click="browseCollection"
+                >
+                  Browse Collection
+                </button>
+              </div>
+            </template>
+
+            <template v-else>
+              <div class="drawer-items">
+                <div
+                  v-for="item in cart.items"
+                  :key="item.id"
+                  class="drawer-item"
+                >
+                  <img :src="item.image" class="drawer-img" />
+
+                  <div class="drawer-info">
+  <h4>{{ item.name }}</h4>
+
+  <p>Qty: {{ item.qty }}</p>
+
+  <p v-if="item.size">
+    Size: {{ item.size }}
+  </p>
+
+  <p v-if="item.color">
+    Color: {{ item.color }}
+  </p>
+
+  <p>
+    Rp
+    {{
+      (item.price * item.qty).toLocaleString("id-ID")
+    }}
+  </p>
+
+  <button
+    class="remove-btn"
+    @click="removeItem(item.id)"
+  >
+    Remove
+  </button>
+</div>
+                </div>
+              </div>
+
+              <div class="drawer-summary">
+                <strong>Total</strong>
+
+                <strong>
+                  Rp {{ cart.totalPrice.toLocaleString("id-ID") }}
+                </strong>
+              </div>
+
+              <button
+                class="btn-continue"
+                @click="browseCollection"
               >
-                <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4H6z" />
-                <path d="M3 6h18M16 10a4 4 0 01-8 0" />
-              </svg>
-            </div>
-
-            <h3 class="empty-text">Your Bag is Empty</h3>
-            <p class="sub-text">Looks like you haven't added anything to your bag yet.</p>
-
-            <div class="action-area">
-              <button class="btn-continue" @click="$emit('close')">Continue Shopping</button>
-              <button class="btn-browse">Browse Collection</button>
-            </div>
+                Continue Shopping
+              </button>
+            </template>
           </div>
         </div>
       </div>
@@ -51,10 +126,26 @@
 </template>
 
 <script setup>
+import { useRouter } from "vue-router";
+import { useCartStore } from "../stores/cart.js";
+
 defineProps({
   isOpen: Boolean,
 });
-defineEmits(["close"]);
+
+const emit = defineEmits(["close"]);
+
+const cart = useCartStore();
+const router = useRouter();
+
+const removeItem = (id) => {
+  cart.removeItem(id);
+};
+
+const browseCollection = () => {
+  emit("close");
+  router.push("/shop");
+};
 </script>
 
 <style scoped>
@@ -89,7 +180,7 @@ defineEmits(["close"]);
 }
 
 .title {
-  font-family: "Playfair Display", "Times New Roman", serif; /* Serif khas fashion luxury */
+  font-family: "Playfair Display", "Times New Roman", serif;
   font-size: 26px;
   font-weight: 400;
   margin: 0;
@@ -108,7 +199,7 @@ defineEmits(["close"]);
 .divider {
   border: 0;
   border-top: 1px solid #eeeeee;
-  margin: 0 -30px 60px -30px; /* Garis full sampai pinggir */
+  margin: 0 -30px 60px -30px;
 }
 
 .cart-content {
@@ -169,14 +260,63 @@ defineEmits(["close"]);
   margin: 0 auto;
 }
 
-/* Animasi */
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.3s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
   transform: scale(0.95);
+}
+
+.drawer-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.drawer-item {
+  display: flex;
+  gap: 14px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 14px;
+}
+
+.drawer-img {
+  width: 70px;
+  height: 90px;
+  object-fit: cover;
+}
+
+.drawer-info h4 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.drawer-info p {
+  margin: 2px 0;
+  font-size: 13px;
+  color: #777;
+}
+
+.remove-btn {
+  margin-top: 6px;
+  background: none;
+  border: none;
+  color: #c0392b;
+  cursor: pointer;
+  padding: 0;
+}
+
+.drawer-summary {
+  display: flex;
+  justify-content: space-between;
+  margin: 24px 0;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
 }
 </style>
