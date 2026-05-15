@@ -31,25 +31,40 @@
             <p class="product-desc">{{ product.desc }}</p>
 
             <div class="selector-section">
-              <p class="section-label">SELECT SIZE</p>
-              <div class="size-options">
-                <button
-                  v-for="size in sizes"
-                  :key="size"
-                  class="size-btn"
-                  :class="{ active: selectedSize === size }"
-                  @click="selectedSize = size"
-                >
-                  {{ size }}
-                </button>
-              </div>
-            </div>
+  <p class="section-label">SELECT SIZE</p>
+  <div class="size-options">
+    <button
+      v-for="size in sizes"
+      :key="size"
+      class="size-btn"
+      :class="{ active: selectedSize === size }"
+      @click="selectedSize = size"
+    >
+      {{ size }}
+    </button>
+  </div>
+</div>
+
+<div v-if="selectedSize" class="selector-section">
+  <p class="section-label">SELECT COLOR</p>
+  <div class="size-options">
+    <button
+      v-for="color in colors"
+      :key="color"
+      class="size-btn"
+      :class="{ active: selectedColor === color }"
+      @click="selectedColor = color"
+    >
+      {{ color }}
+    </button>
+  </div>
+</div>
 
             <div class="actions-section">
               <button class="btn-primary" @click="handleAddToBag">+ Add to Bag</button>
-              <a href="https://shopee.co.id/yourshop" target="_blank" class="btn-shopee">
+              <button class="btn-shopee" @click="checkoutShopee">
                 Checkout on Shopee
-              </a>
+              </button>
             </div>
 
             <div class="extra-info">
@@ -72,40 +87,157 @@
       </div>
     </div>
   </Transition>
+
+  <transition name="toast">
+  <div v-if="showToast" class="custom-toast">
+    <span class="toast-icon">✓</span>
+    <span>{{ toastMessage }}</span>
+    <button @click="showToast = false">×</button>
+  </div>
+</transition>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
+import { useCartStore } from "../stores/cart.js";
 
-// Props dari parent (ShopView)
 const props = defineProps(["isOpen", "product"]);
 defineEmits(["close"]);
 
-// Local states
+const cart = useCartStore();
 const activeImage = ref(null);
 const selectedSize = ref(null);
-const sizes = ["XS", "S", "M", "L", "XL"];
+const selectedColor = ref(null);
 
-// Penting: Reset status saat ganti produk
+const parseVariant = (variantName = "") => {
+  // Format: Broken White (M)
+  const parenMatch = variantName.match(/(.+?)\s*\(([^)]+)\)/);
+
+  if (parenMatch) {
+    return {
+      color: parenMatch[1].trim(),
+      size: parenMatch[2].trim(),
+    };
+  }
+
+  // Format: Broken White,M
+  const commaParts = variantName.split(",");
+
+  if (commaParts.length >= 2) {
+    return {
+      color: commaParts[0].trim(),
+      size: commaParts[1].trim(),
+    };
+  }
+
+  return {
+    color: variantName.trim(),
+    size: "",
+  };
+};
+ 
+
+const availableVariants = computed(() => {
+  return props.product?.variants?.filter((variant) => variant.stock > 0) || [];
+});
+
+const sizeOrder = ["XS", "S", "M", "L", "XL"];
+const sizes = computed(() => {
+  const uniqueSizes = [
+    ...new Set(
+      availableVariants.value
+        .map((variant) => parseVariant(variant.name).size)
+        .filter(Boolean)
+    ),
+  ];
+
+  return uniqueSizes.sort((a, b) => {
+    return sizeOrder.indexOf(a) - sizeOrder.indexOf(b);
+  });
+});
+
+const colors = computed(() => {
+  if (!selectedSize.value) return [];
+
+  return [
+    ...new Set(
+      availableVariants.value
+        .filter((variant) => parseVariant(variant.name).size === selectedSize.value)
+        .map((variant) => parseVariant(variant.name).color)
+    ),
+  ];
+});
+
+const selectedVariant = computed(() => {
+  if (!selectedSize.value || !selectedColor.value) return null;
+
+  return availableVariants.value.find((variant) => {
+    const parsed = parseVariant(variant.name);
+
+    return parsed.size === selectedSize.value && parsed.color === selectedColor.value;
+  });
+});
+
 watch(
   () => props.product,
   (newProd) => {
     if (newProd) {
-      activeImage.value = newProd.images[0]; // Reset ke gambar pertama
-      selectedSize.value = null; // Reset size yang dipilih
+      activeImage.value = newProd.images?.[0] || newProd.image;
+      selectedSize.value = null;
+      selectedColor.value = null;
     }
-  },
+  }
 );
 
-const formatPrice = (val) => `Rp ${val.toLocaleString("id-ID")}`;
+watch(selectedSize, () => {
+  selectedColor.value = null;
+});
+
+
+const formatPrice = (val) => `Rp ${Number(val || 0).toLocaleString("id-ID")}`;
 
 const handleAddToBag = () => {
   if (!selectedSize.value) {
     alert("Please select a size first.");
     return;
   }
-  // Logic tambahkan ke keranjang global bisa ditaruh di sini
-  console.log("Added to bag:", props.product.name, "Size:", selectedSize.value);
+
+  if (!selectedColor.value) {
+    alert("Please select a color first.");
+    return;
+  }
+
+  cart.addItem({
+    id: `${props.product.id}-${selectedVariant.value.id}`,
+    name: props.product.name,
+    price: selectedVariant.value.price || props.product.price,
+    image: props.product.image,
+    size: selectedSize.value,
+    color: selectedColor.value,
+  });
+
+  triggerToast("Added to bag");
+};
+
+const toastMessage = ref("");
+const showToast = ref(false);
+
+const triggerToast = (message) => {
+  toastMessage.value = message;
+  showToast.value = true;
+
+  setTimeout(() => {
+    showToast.value = false;
+  }, 2500);
+};
+
+const checkoutShopee = () => {
+  if (!props.product?.shopeeUrl) {
+    alert("Shopee link is not available.");
+    return;
+  }
+
+  window.open(props.product.shopeeUrl, "_blank");
 };
 </script>
 
@@ -272,6 +404,7 @@ const handleAddToBag = () => {
   text-decoration: none;
   padding: 18px;
   font-size: 13px;
+  cursor: pointer;
 }
 .btn-primary:hover {
   background: #755938;
@@ -328,5 +461,61 @@ const handleAddToBag = () => {
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+.custom-toast {
+  position: fixed;
+  top: 32px;
+  right: 48px;
+  z-index: 9999;
+
+  min-width: 360px;
+  padding: 18px 22px;
+
+  background: white;
+  border: 1px solid #eee;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  font-family: "FONTSPRING DEMO - The Seasons", serif;
+  font-size: 15px;
+  color: #1a1a1a;
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #8c6a43;
+  color: #8c6a43;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+}
+
+.custom-toast button {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: #bbb;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.25s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

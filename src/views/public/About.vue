@@ -1,19 +1,11 @@
 <template>
   <div class="about-container">
     <section class="story-section">
-      <span class="label">OUR STORY</span>
-      <h1 class="serif-title">About SHEENA</h1>
-      <p class="description">
-        Founded on the principles of quiet luxury and refined aesthetics, SHEENA celebrates the art
-        of understated elegance. We believe that true style transcends trends, residing in the
-        quality of craftsmanship, the integrity of materials, and the harmony of design. Founded on
-        the principles of quiet luxury and refined aesthetics, SHEENA celebrates the art of
-        understated elegance. We believe that true style transcends trends, residing in the quality
-        of craftsmanship, the integrity of materials, and the harmony of design. We create for the
-        discerning woman who values quality over quantity, who understands that luxury whispers
-        rather than shouts. This is fashion with intention—pieces that become more beautiful with
-        time and tell your unique story.
-      </p>
+      <span class="label">{{ content.about_subtitle || "OUR STORY" }}</span>
+        <h1 class="serif-title">{{ content.about_title || "About SHEENA" }}</h1>
+        <p class="description">
+          {{ content.about_story || "Founded on the principles of quiet luxury and refined aesthetics, SHEENA celebrates the art of understated elegance." }}
+        </p>
     </section>
 
     <section class="subscribe-section">
@@ -44,10 +36,22 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 const emailInput = ref("");
 const showSuccessAlert = ref(false);
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
+const content = ref({});
+
+const fetchContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    headers: { Accept: "application/json" },
+  });
+
+  const result = await response.json();
+  content.value = result.data || {};
+};
 
 const handleSubscribe = () => {
   if (emailInput.value) {
@@ -67,6 +71,8 @@ const handleSubscribe = () => {
     }, 4000);
   }
 };
+
+onMounted(fetchContent);
 </script>
 
 <style scoped>

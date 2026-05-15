@@ -1,42 +1,52 @@
-// src/stores/cart.js
 import { defineStore } from "pinia";
 
 export const useCartStore = defineStore("cart", {
-  // State: Tempat naruh data (seperti 'data' di Vue)
   state: () => ({
-    items: [
-      {
-        id: 1,
-        name: "Diana Cashmere Dress",
-        sku: "000001",
-        price: 2890000,
-        qty: 2,
-        size: "XS",
-        color: "Natural",
-        image: "/img/product-1.jpg",
-      },
-    ],
+    items: JSON.parse(localStorage.getItem("shopping_bag") || "[]"),
   }),
 
-  // Getters: Data olahan (seperti 'computed' di Vue)
   getters: {
-    totalPrice: (state) => state.items.reduce((acc, item) => acc + item.price * item.qty, 0),
     isEmpty: (state) => state.items.length === 0,
-    totalItems: (state) => state.items.length,
+    totalItems: (state) =>
+      state.items.reduce((total, item) => total + item.qty, 0),
+
+    totalPrice: (state) =>
+      state.items.reduce((total, item) => total + item.price * item.qty, 0),
   },
 
-  // Actions: Fungsi untuk mengubah data (seperti 'methods' di Vue)
   actions: {
-    addToCart(product) {
-      const existing = this.items.find((i) => i.id === product.id);
-      if (existing) {
-        existing.qty++;
-      } else {
-        this.items.push({ ...product, qty: 1 });
-      }
+    saveCart() {
+      localStorage.setItem("shopping_bag", JSON.stringify(this.items));
     },
+
+   addItem(product) {
+  const existing = this.items.find((item) => item.id === product.id);
+
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    this.items.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      size: product.size,
+      color: product.color,
+      qty: 1,
+    });
+  }
+
+  this.saveCart();
+},
+
     removeItem(id) {
-      this.items = this.items.filter((i) => i.id !== id);
+      this.items = this.items.filter((item) => item.id !== id);
+      this.saveCart();
+    },
+
+    clearCart() {
+      this.items = [];
+      this.saveCart();
     },
   },
 });

@@ -5,130 +5,38 @@
         <h1 class="serif-title">Manage Content</h1>
         <p class="subtitle">Update website content, text, and images</p>
       </div>
-      <button class="btn-edit"><span class="icon">✎</span> Edit Data</button>
+      <button class="btn-edit" @click="saveContent">
+         <Save class="save-icon" />
+  Save Data
+</button>
     </header>
 
     <div class="content-grid">
       <div class="column">
-        <section class="content-card">
-          <h2 class="card-title">Hero Section</h2>
-          <div class="input-row">
-            <div class="input-group">
-              <label>Title</label>
-              <input type="text" placeholder="Enter title" />
-            </div>
-            <div class="input-group">
-              <label>Subtitle</label>
-              <input type="text" placeholder="Enter subtitle" />
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Button Text</label>
-            <textarea rows="3" placeholder="Enter button text"></textarea>
-          </div>
-          <div class="upload-section">
-            <label>Hero Banner Image</label>
-            <div class="upload-box">
-              <span class="upload-icon">↑</span>
-              <span>Upload New Banner</span>
-            </div>
-          </div>
-        </section>
+  <section class="content-card">
+    <h2 class="card-title">Shop Header</h2>
 
-        <section class="content-card">
-          <h2 class="card-title">Section 2</h2>
-          <div class="input-row">
-            <div class="input-group">
-              <label>Title</label>
-              <input type="text" />
-            </div>
-            <div class="input-group">
-              <label>Subtitle</label>
-              <input type="text" />
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Description</label>
-            <textarea rows="3"></textarea>
-          </div>
-
-          <div class="featured-banners-grid">
-            <label class="full-width-label">Hero Banner Image</label>
-            <div v-for="i in 4" :key="i" class="banner-item">
-              <div class="image-placeholder">
-                <div class="img-icon">🖼</div>
-              </div>
-              <p class="banner-label">Featured Banner 1</p>
-              <div class="mini-upload">
-                <span>↑ Upload Image</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="content-card">
-          <h2 class="card-title">Promotional Banner</h2>
-          <div class="input-row">
-            <div class="input-group">
-              <label>Title</label>
-              <input type="text" />
-            </div>
-            <div class="input-group">
-              <label>Subtitle</label>
-              <input type="text" />
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Description</label>
-            <textarea rows="3"></textarea>
-          </div>
-          <div class="upload-section">
-            <label>Hero Banner Image</label>
-            <div class="upload-box">
-              <span class="upload-icon">↑</span>
-              <span>Upload New Banner</span>
-            </div>
-          </div>
-        </section>
+    <div class="input-row">
+      <div class="input-group">
+        <label>Label</label>
+        <input
+          type="text"
+          v-model="form.shop_label"
+          placeholder="EXPLORE"
+        />
       </div>
 
-      <div class="column">
-        <section class="content-card">
-          <h2 class="card-title">Section 3</h2>
-          <div class="input-row">
-            <div class="input-group">
-              <label>Title</label>
-              <input type="text" />
-            </div>
-            <div class="input-group">
-              <label>Subtitle</label>
-              <input type="text" />
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Button Text</label>
-            <textarea rows="3"></textarea>
-          </div>
-        </section>
-
-        <section class="content-card">
-          <h2 class="card-title">Editor Picks</h2>
-          <div class="input-row">
-            <div class="input-group">
-              <label>Title</label>
-              <input type="text" />
-            </div>
-            <div class="input-group">
-              <label>Subtitle</label>
-              <input type="text" />
-            </div>
-          </div>
-          <div class="input-group">
-            <label>Button Text</label>
-            <textarea rows="3"></textarea>
-          </div>
-        </section>
+      <div class="input-group">
+        <label>Title</label>
+        <input
+          type="text"
+          v-model="form.shop_title"
+          placeholder="Shop Collection"
+        />
       </div>
+    </div>
+  </section>
+</div>
     </div>
 
     <footer class="sync-note">
@@ -138,10 +46,83 @@
       </p>
     </footer>
   </div>
+
+  <transition name="toast">
+  <div v-if="showToast" class="custom-toast">
+    <span class="toast-icon">✓</span>
+
+    <span>{{ toastMessage }}</span>
+
+    <button @click="showToast = false">×</button>
+  </div>
+</transition>
 </template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import { Save } from "lucide-vue-next";
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
+
+const form = ref({
+  shop_label: "EXPLORE",
+  shop_title: "Shop Collection",
+});
+
+const fetchContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`);
+  const result = await response.json();
+
+  form.value = {
+    ...form.value,
+    ...(result.data || {}),
+  };
+};
+
+const toastMessage = ref("");
+const showToast = ref(false);
+
+const triggerToast = (message) => {
+  toastMessage.value = message;
+  showToast.value = true;
+
+  setTimeout(() => {
+    showToast.value = false;
+  }, 2500);
+};
+
+const saveContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+    },
+    body: JSON.stringify(form.value),
+  });
+
+  const result = await response.json();
+
+  console.log("STATUS:", response.status);
+  console.log("RESULT:", result);
+  console.log("FORM:", form.value);
+
+  triggerToast(result.message || "Content saved");
+
+  await fetchContent();
+};
+
+onMounted(fetchContent);
+</script>
 
 <style scoped>
 /* Container & Layout */
+
+* {
+  box-sizing: border-box;
+}
+
 .manage-home-container {
   padding: 40px;
   background-color: #fbfbfb;
@@ -169,6 +150,11 @@
   margin-top: 4px;
 }
 
+.save-icon {
+  width: 18px;
+  height: 18px;
+}
+
 .btn-edit {
   display: flex;
   align-items: center;
@@ -185,8 +171,6 @@
 /* Grid System */
 .content-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 24px;
 }
 
 .column {
@@ -242,6 +226,7 @@ textarea {
   outline: none;
   font-size: 14px;
   width: 100%;
+  max-width: 100%;
 }
 
 input:focus,
@@ -333,5 +318,68 @@ textarea:focus {
   .content-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.custom-toast {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  z-index: 9999;
+
+  min-width: 380px;
+
+  background: white;
+  border: 1px solid #eee;
+
+  padding: 18px 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  font-family: "FONTSPRING DEMO - The Seasons";
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+  border: 1px solid #8c6a43;
+
+  color: #8c6a43;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+}
+
+.custom-toast button {
+  margin-left: auto;
+
+  background: transparent;
+  border: none;
+
+  color: #bbb;
+
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.25s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

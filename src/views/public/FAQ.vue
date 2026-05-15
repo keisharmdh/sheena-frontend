@@ -1,7 +1,7 @@
 <template>
   <div class="faq-container">
     <div class="back-navigation" @click="$router.back()">
-      <span class="arrow">‹</span> Back to Help
+      <span class="arrow">‹</span> Back
     </div>
 
     <header class="faq-header">
@@ -43,80 +43,43 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
 
 const activeIndex = ref(null);
 
-const faqData = [
+const faqData = ref([
   {
     question: "How do I purchase items from SHEENA?",
     answer:
-      "All SHEENA products are purchased through Shopee marketplace. When you click 'Add to Bag' and proceed to checkout on our website, you will be redirected to Shopee to complete your purchase securely. This ensures you have access to multiple payment options and buyer protection.",
+      "All SHEENA products are purchased through Shopee marketplace.",
   },
-  {
-    question: "How long does shipping take?",
-    answer:
-      "Shipping times depend on the courier you select during Shopee checkout and your location. Express couriers typically deliver within 2-3 business days, while standard shipping may take 5-7 business days. Shopee will display the estimated delivery date for your specific address during checkout.",
-  },
-  {
-    question: "Can I return or exchange an item?",
-    answer:
-      "Yes, returns and exchanges are handled through Shopee's return system. You can initiate a return or exchange request directly through your Shopee account within 14 days of delivery. Items must be unworn, unwashed, and in their original condition with all tags attached. Please refer to Shopee's return policy for detailed instructions.",
-  },
-  {
-    question: "How do I track my order?",
-    answer:
-      "After completing your purchase on Shopee, you can track your order directly through your Shopee account. You will receive real-time updates on order confirmation, package shipment, delivery status, and estimated arrival time. Shopee will also send you tracking notifications via email and app.",
-  },
-  {
-    question: "What payment methods are accepted?",
-    answer:
-      "We accept all payment methods supported by Shopee, including credit/debit cards (Visa, Mastercard, American Express), bank transfers, ShopeePay, and cash on delivery (where available). All transactions are processed securely through Shopee's payment gateway with buyer protection.",
-  },
-  {
-    question: "How do I know size to order?",
-    answer:
-      "Please refer to our detailed Size Guide which includes measurement instructions and size charts for all our products. If you're between sizes, we recommend sizing up for a more comfortable fit. You can also contact our customer support team for personalized sizing recommendations before making your purchase.",
-  },
-  {
-    question: "What shipping couriers are available?",
-    answer:
-      "Shipping options follow Shopee's available couriers, which may include standard shipping, express delivery, and economy options. You can view all available couriers and their estimated delivery times during the Shopee checkout process. Courier availability may vary based on your location.",
-  },
-  {
-    question: "Can I modify or cancel my order?",
-    answer:
-      "Orders can be cancelled or modified through your Shopee account before the seller ships the item. Once the order has been shipped, cancellation is no longer possible. To cancel an order, go to your Shopee account, find the order, and select 'Cancel Order'. For assistance, you can contact Shopee customer service or our support team.",
-  },
-  {
-    question: "Are your products made form quality materials?",
-    answer:
-      "Yes, all SHEENA pieces are crafted from premium natural materials including cashmere, silk, merino wool, and virgin wool. We are committed to quality and sustainability, working with certified suppliers who maintain ethical and sustainable practices. Each product page includes detailed material information.",
-  },
-  {
-    question: "How should I care for my garments?",
-    answer:
-      "Each product comes with specific care instructions on the label and product page. Generally, our luxury pieces require gentle care - hand washing or dry cleaning is recommended for most items. Proper care will ensure your SHEENA pieces maintain their quality and beauty for years to come.",
-  },
-  {
-    question: "Is my personal information secure?",
-    answer:
-      "Yes, your privacy and security are our top priorities. All transactions are processed through Shopee's secure payment system, which is encrypted and PCI-DSS compliant. We never store your payment information on our website. Your personal data is protected according to Shopee's privacy policy and our own privacy standards.",
-  },
-  {
-    question: "What if I recieve a damaged or incorrect item?",
-    answer:
-      "If you receive a damaged or incorrect item, please contact us immediately through our Contact page or initiate a return request through your Shopee account. Shopee's buyer protection ensures you can request a refund or replacement for damaged or incorrect items. Please provide photos of the issue when submitting your request.",
-  },
-];
+]);
+
+const fetchContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const result = await response.json();
+
+  if (result.data?.footer_faq_items) {
+    faqData.value = JSON.parse(result.data.footer_faq_items);
+  }
+};
 
 const toggleAccordion = (index) => {
   if (activeIndex.value === index) {
-    activeIndex.value = null; // Tutup jika diklik lagi
+    activeIndex.value = null;
   } else {
-    activeIndex.value = index; // Buka yang baru
+    activeIndex.value = index;
   }
 };
+
+onMounted(fetchContent);
 </script>
 
 <style scoped>

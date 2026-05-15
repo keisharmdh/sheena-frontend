@@ -53,31 +53,63 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in products" :key="item.sku">
-              <td class="product-cell">
-                <img :src="item.image" class="prod-img" />
-                <div class="prod-info">
-                  <p class="prod-name">{{ item.name }}</p>
-                  <p class="prod-sku">SKU: {{ item.sku }}</p>
-                </div>
-              </td>
-              <td class="price-cell">Rp {{ item.price.toLocaleString() }}</td>
-              <td>
-                <span class="tag-collection">{{ item.collection }}</span>
-              </td>
-              <td>
-                <span :class="['stock-text', item.stock < 10 ? 'stock-low' : 'stock-normal']">
-                  {{ item.stock }} units
-                </span>
-              </td>
-              <td class="size-text">{{ item.sizes.join(", ") }}</td>
-              <td><span class="badge-status">Active</span></td>
-            </tr>
-          </tbody>
+  <tr v-for="item in filteredProducts" :key="item.sku">
+    
+    <td class="product-cell">
+      <img :src="item.image" class="prod-img" />
+
+      <div class="prod-info">
+        <p class="prod-name">{{ item.name }}</p>
+        <p class="prod-sku">SKU: {{ item.sku }}</p>
+      </div>
+    </td>
+
+    <td class="price-cell">
+      Rp {{ item.price.toLocaleString() }}
+    </td>
+
+    <td>
+      <span class="tag-collection">
+        {{ item.collection }}
+      </span>
+    </td>
+
+    <td>
+      <span
+        :class="[
+          'stock-text',
+          item.stock < 10 ? 'stock-low' : 'stock-normal'
+        ]"
+      >
+        {{ item.stock }} products
+      </span>
+    </td>
+
+    <td class="size-text">
+      <ul class="size-list">
+        <li v-for="size in item.sizes" :key="size">
+          {{ size.replace(',', ' (') + ')' }}
+        </li>
+      </ul>
+    </td>
+
+    <td>
+      <span
+        :class="[
+          'badge-status',
+          item.stock > 0 ? 'status-ready' : 'status-out'
+        ]"
+      >
+        {{ item.stock > 0 ? 'Ready' : 'Out of Stock' }}
+      </span>
+    </td>
+
+  </tr>
+</tbody>
         </table>
       </div>
       <div class="table-footer">
-        Showing {{ products.length }} of {{ products.length }} products
+        Showing {{ filteredProducts.length }} of {{ products.length }} products
       </div>
     </div>
 
@@ -90,66 +122,91 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
 
 const searchQuery = ref("");
+const products = ref([]);
 
-const products = ref([
-  {
-    name: "Diana Cashmere Dress",
-    sku: "000001",
-    price: 2890000,
-    collection: "Diana",
-    stock: 34,
-    sizes: ["S", "M", "L"],
-    image: "https://placehold.co/100x120",
-  },
-  {
-    name: "Miyari Silk Blouse",
-    sku: "000002",
-    price: 1190000,
-    collection: "Miyari",
-    stock: 31,
-    sizes: ["S", "M", "L"],
-    image: "https://placehold.co/100x120",
-  },
-  {
-    name: "Diana Cashmere Cardigan",
-    sku: "000003",
-    price: 2490000,
-    collection: "Diana",
-    stock: 6,
-    sizes: ["S", "M", "L"],
-    image: "https://placehold.co/100x120",
-  },
-  {
-    name: "Valerie Wool Coat",
-    sku: "000004",
-    price: 3390000,
-    collection: "Valerie",
-    stock: 16,
-    sizes: ["S", "M", "L"],
-    image: "https://placehold.co/100x120",
-  },
-  {
-    name: "Diana Merino Sweater",
-    sku: "000005",
-    price: 1890000,
-    collection: "Diana",
-    stock: 33,
-    sizes: ["S", "M", "L"],
-    image: "https://placehold.co/100x120",
-  },
-  {
-    name: "Miyari Satin Top",
-    sku: "000006",
-    price: 1390000,
-    collection: "Miyari",
-    stock: 7,
-    sizes: ["S", "M", "L"],
-    image: "https://placehold.co/100x120",
-  },
-]);
+const getCollectionName = (name) => {
+  const productName = name.toLowerCase();
+
+  if (productName.includes("miyari")) return "Miyari";
+  if (productName.includes("myza")) return "MYZA";
+  if (productName.includes("diana")) return "Diana";
+  if (productName.includes("valerie")) return "Valerie";
+
+  return "Others";
+};
+
+const cleanProductName = (name) => {
+  return name
+    ?.replace(/Meet The Sheena\s*[-—]?\s*/gi, "")
+    ?.replace(/Shopee Indonesia/gi, "")
+    ?.trim();
+};
+
+const fetchProducts = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/products`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+      },
+    });
+
+    const result = await response.json();
+
+    const productList = Array.isArray(result.data)
+      ? result.data
+      : result.data?.data || [];
+
+    products.value = productList.map((product) => {
+      const listings = product.product_listings || [];
+
+      const validPriceListing =
+        listings.find((item) => Number(item.price) > 0) || listings[0];
+
+      const totalStock = listings.reduce((sum, item) => {
+        return sum + Number(item.stock || 0);
+      }, 0);
+
+      const sizes = [
+        ...new Set(
+          listings
+            .map((item) => item.variant_name)
+            .filter(Boolean)
+        ),
+      ];
+
+      return {
+        id: product.id_product,
+        name: cleanProductName(product.product_name),
+        sku: product.shopee_item_id || product.id_product || "-",
+        price: Number(validPriceListing?.price || 0),
+        collection: getCollectionName(product.product_name),
+        stock: totalStock,
+        sizes: sizes.length ? sizes : ["-"],
+        image: product.product_image || "https://placehold.co/100x120",
+      };
+    });
+  } catch (error) {
+    console.error("Gagal fetch products:", error);
+  }
+};
+
+const filteredProducts = computed(() => {
+  return products.value.filter((item) => {
+    return item.name
+      .toLowerCase()
+      .includes(searchQuery.value.toLowerCase());
+  });
+});
+
+onMounted(() => {
+  fetchProducts();
+});
 </script>
 
 <style scoped>
@@ -243,16 +300,29 @@ const products = ref([
   border-bottom: 1px solid #f5f5f5;
 }
 .product-table td {
-  padding: 15px 20px;
+  padding: 22px 20px;
   border-bottom: 1px solid #f9f9f9;
   font-size: 14px;
   vertical-align: middle;
 }
 
 .product-cell {
-  display: flex;
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
   align-items: center;
   gap: 15px;
+}
+
+.prod-info {
+  min-width: 0;
+}
+
+.prod-name {
+  font-weight: 500;
+  color: #333;
+  margin: 0 0 3px;
+  line-height: 1.4;
+  max-width: 420px;
 }
 .prod-img {
   width: 50px;
@@ -261,11 +331,7 @@ const products = ref([
   border-radius: 5px;
   background: #f5f5f5;
 }
-.prod-name {
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 3px;
-}
+
 .prod-sku {
   font-size: 12px;
   color: #bbb;
@@ -321,5 +387,93 @@ const products = ref([
   font-size: 12px;
   color: #888;
   line-height: 1.6;
+}
+
+.product-table {
+  table-layout: fixed;
+}
+
+.product-table th:nth-child(1),
+.product-table td:nth-child(1) {
+  width: 80%;
+}
+
+.product-table th:nth-child(2),
+.product-table td:nth-child(2) {
+  width: 11%;
+  white-space: nowrap;
+}
+
+.product-table th:nth-child(3),
+.product-table td:nth-child(3) {
+  width: 9%;
+}
+
+.product-table th:nth-child(4),
+.product-table td:nth-child(4) {
+  width: 10%;
+  white-space: nowrap;
+}
+
+.product-table th:nth-child(5),
+.product-table td:nth-child(5) {
+  width: 18%;
+}
+
+.product-table th:nth-child(6),
+.product-table td:nth-child(6) {
+  width: 10%;
+}
+
+.size-list {
+  margin: 0;
+  padding-left: 16px;
+  line-height: 1.5;
+}
+
+.size-list li {
+  margin-bottom: 2px;
+}
+
+.price-cell,
+.stock-text {
+  white-space: nowrap;
+}
+
+.badge-status {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.status-ready {
+  background: #e8f7ef;
+  color: #22a06b;
+}
+
+.status-out {
+  background: #ffeaea;
+  color: #e5484d;
+}
+
+.prod-name {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 3px;
+  line-height: 1.5;
+}
+
+.size-list {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.6;
+}
+
+.size-list li {
+  margin-bottom: 2px;
+  word-break: break-word;
 }
 </style>

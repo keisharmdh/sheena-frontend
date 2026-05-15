@@ -3,8 +3,11 @@
     <div v-if="cart.isEmpty" class="empty-cart-full">
       <h2>Your bag is empty</h2>
       <router-link to="/shop">Go Shopping</router-link>
+      <RouterLink to="/shop" class="browse-link">
+        Browse Collection
+      </RouterLink>
     </div>
-
+    
     <div v-else class="cart-content">
       <div class="items-list">
         <div v-for="item in cart.items" :key="item.id" class="cart-item">
@@ -31,7 +34,6 @@ import { useCartStore } from "../../stores/cart.js";
 
 const cart = useCartStore();
 
-// Fungsi untuk hapus
 const removeItem = (id) => {
   if (confirm("Remove this item?")) {
     cart.removeItem(id);

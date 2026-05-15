@@ -61,12 +61,12 @@
               class="menu-item w-full"
               :class="{ 'active-parent': isChildActive }"
             >
-              <div class="item-content justify-between w-full">
-                <div class="flex items-center gap-3">
+              <div class="dropdown-content">
+                <div class="item-left">
                   <span class="menu-icon">
                     <svg
-                      width="20"
-                      height="20"
+                      width="19"
+                      height="19"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -76,7 +76,7 @@
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                     </svg>
                   </span>
-                  <span class="menu-label">Manage Content</span>
+                  <span class="menu-label"> Manage Content</span>
                 </div>
                 <svg
                   :class="{ 'rotate-180': isContentOpen }"
@@ -99,7 +99,7 @@
                   class="sub-menu-item"
                   active-class="active-sub"
                 >
-                  <span class="menu-icon">🏠</span>
+                  <Home class="submenu-icon" />
                   <span class="sub-label">Home</span>
                 </router-link>
                 <router-link
@@ -107,7 +107,7 @@
                   class="sub-menu-item"
                   active-class="active-sub"
                 >
-                  <span class="menu-icon">🛍️</span>
+                  <ShoppingBag class="submenu-icon" />
                   <span class="sub-label">Shop</span>
                 </router-link>
                 <router-link
@@ -115,7 +115,7 @@
                   class="sub-menu-item"
                   active-class="active-sub"
                 >
-                  <span class="menu-icon">ℹ️</span>
+                  <Info class="submenu-icon" />
                   <span class="sub-label">About</span>
                 </router-link>
                 <router-link
@@ -123,7 +123,7 @@
                   class="sub-menu-item"
                   active-class="active-sub"
                 >
-                  <span class="menu-icon">💻</span>
+                  <PanelBottom class="submenu-icon" />
                   <span class="sub-label">Footer</span>
                 </router-link>
               </div>
@@ -197,9 +197,11 @@
 
 <script setup>
 import { ref, computed } from "vue"; //
-import { useRoute } from "vue-router"; //
+import { useRoute, useRouter } from "vue-router"; 
+import { Home, ShoppingBag, Info, PanelBottom } from "lucide-vue-next";
 
-const route = useRoute(); //
+const route = useRoute();
+const router = useRouter(); //
 
 // Props untuk kontrol sidebar mobile (jika ada)
 defineProps({
@@ -223,7 +225,10 @@ const isChildActive = computed(() => {
 });
 
 const handleLogout = () => {
-  // Tambahkan logika logout di sini
+  localStorage.removeItem("admin_token");
+  localStorage.removeItem("admin_user");
+  router.push("/admin/login");
+
   console.log("Logging out...");
 };
 </script>
@@ -289,7 +294,8 @@ const handleLogout = () => {
 .logout-btn {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start; /* GANTI */
+  gap: 15px; /* TAMBAH */
   padding: 14px 18px;
   margin-bottom: 10px;
   text-decoration: none;
@@ -302,8 +308,37 @@ const handleLogout = () => {
   cursor: pointer;
   font-family: inherit;
 }
+.menu-icon,
+.logout-icon {
+  width: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.manage-content-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.submenu-icon {
+  width: 18px;
+  height: 18px;
+  color: #999;
+}
+
+.submenu-item.router-link-active .submenu-icon,
+.submenu-item.active .submenu-icon {
+  color: #8c6a43;
+}
 
 .item-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.item-left {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -350,7 +385,12 @@ const handleLogout = () => {
   font-size: 14px;
   font-weight: 500;
 }
-
+.dropdown-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
 @media (max-width: 768px) {
   .close-mobile-btn {
     display: block;

@@ -42,6 +42,11 @@
           />
         </div>
 
+        <p v-if="errorMessage" class="error-message">
+  {{ errorMessage }}
+</p>
+
+
         <button type="submit" class="btn-login" :disabled="isLoading">
           {{ isLoading ? "Logging in..." : "Login" }}
         </button>
@@ -57,18 +62,48 @@ import { useRouter } from "vue-router";
 const email = ref("");
 const password = ref("");
 const isLoading = ref(false);
+const errorMessage = ref("");
 const router = useRouter();
+
 
 const handleLogin = async () => {
   isLoading.value = true;
+  errorMessage.value = "";
+  
 
-  // Simulasi logika login
-  setTimeout(() => {
-    console.log("Login attempt:", email.value);
+  try {
+    const response = await fetch(
+      "https://sheena-backend-production.up.railway.app/api/admin/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          email: email.value,
+          password: password.value,
+        }),
+      }
+    );
+
+    const result = await response.json();
+    console.log("Status:", response.status);
+    console.log("Result:", result);
+
+    if (!response.ok) {
+      throw new Error(result.message || "Login gagal");
+    }
+
+    localStorage.setItem("admin_token", result.token);
+    localStorage.setItem("admin_user", JSON.stringify(result.data));
+
+    router.push("/admin/dashboard");
+  } catch (error) {
+    errorMessage.value = error.message || "Terjadi kesalahan saat login";
+  } finally {
     isLoading.value = false;
-    // Jika sukses, arahkan ke dashboard admin
-    // router.push('/admin/dashboard');
-  }, 1500);
+  }
 };
 </script>
 
@@ -106,7 +141,7 @@ const handleLogin = async () => {
   border-radius: 16px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
   width: 100%;
-  max-width: 450px;
+  max-width: 380px;
   text-align: center;
 }
 
@@ -141,12 +176,60 @@ const handleLogin = async () => {
 }
 
 .login-form {
+  width: 100%;
+  margin: 0 auto;
   text-align: left;
 }
 
-.input-group {
-  margin-bottom: 24px;
+.input-group input {
+  width: 100%;
+  height: 52px;
+  box-sizing: border-box;
+  padding: 0 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+  background: white;
+  color: #1a1a1a;
 }
+
+
+
+.input-group input:focus {
+  border-color: #8c6a43;
+}
+.input-group {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.input-group input {
+  width: 100%;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: white;
+  color: #1a1a1a;
+}
+
+.btn-login {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: 8px;
+  background: #8c6a43;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+
 
 .input-group label {
   display: block;
@@ -156,15 +239,6 @@ const handleLogin = async () => {
   margin-bottom: 8px;
 }
 
-.input-group input {
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.3s;
-}
 
 .input-group input:focus {
   border-color: #8c6a43;
@@ -197,5 +271,12 @@ const handleLogin = async () => {
 .btn-login:disabled {
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+.error-message {
+  color: #d93025;
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 16px;
 }
 </style>

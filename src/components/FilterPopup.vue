@@ -28,7 +28,7 @@
 defineProps(["isOpen", "activeCollection"]);
 const emit = defineEmits(["close", "update:collection"]);
 
-const collections = ["All", "Diana", "Miyari", "Myra", "Valerie"];
+const collections = ["All", "Diana", "Miyari", "MYZA", "Valerie"];
 
 const selectCollection = (col) => {
   emit("update:collection", col);

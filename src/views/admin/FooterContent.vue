@@ -5,7 +5,10 @@
         <h1 class="serif-title">Manage Content</h1>
         <p class="subtitle">Update website content, text, and images</p>
       </div>
-      <button class="btn-edit-data"><span class="icon">✎</span> Edit Data</button>
+      <button class="btn-edit-data" @click="saveContent">
+        <Save class="save-icon" />
+  Save Data
+      </button>
     </header>
 
     <div class="accordion-container">
@@ -17,11 +20,16 @@
         <div class="section-body">
           <div class="form-group">
             <label>Footer Title</label>
-            <input type="text" class="admin-input" placeholder="SHEENA" />
+            <input
+  v-model="form.footer_about_title"
+  type="text"
+  class="admin-input"
+  placeholder="ABOUT SHEENA"
+/>
           </div>
           <div class="form-group">
             <label>Brand Description</label>
-            <textarea class="admin-textarea" rows="4"></textarea>
+            <textarea v-model="form.footer_about_desc" class="admin-textarea" rows="4"></textarea>
           </div>
         </div>
       </div>
@@ -32,44 +40,129 @@
           <span class="arrow-toggle">▼</span>
         </div>
         <div class="section-body">
-          <div v-for="i in 3" :key="i" class="pill-item">
-            <div class="pill-left">
-              <div class="icon-circle">🔗</div>
-              <span class="platform-name">Instagram</span>
-              <span class="url-text">https://instagram.com/sheena</span>
-            </div>
-            <div class="pill-actions">
-              <button class="action-btn">✎</button>
-              <button class="action-btn delete">🗑</button>
-            </div>
-          </div>
-          <button class="btn-dashed-add">+ ADD NEW SOCIAL MEDIA</button>
+         <div
+  v-for="(social, index) in socialLinks"
+  :key="index"
+  class="pill-item"
+>
+  <div class="pill-left">
+    <div class="icon-circle">🔗</div>
+
+    <template v-if="social.isEditing">
+      <input
+        v-model="social.platform"
+        type="text"
+        class="admin-input social-name-input"
+        placeholder="Platform name"
+      />
+
+      <input
+        v-model="social.url"
+        type="text"
+        class="admin-input social-url-input"
+        placeholder="Social media URL"
+      />
+    </template>
+
+    <template v-else>
+      <span class="platform-name">
+        {{ social.platform }}
+      </span>
+
+      <span class="url-text">
+        {{ social.url }}
+      </span>
+    </template>
+
+    <transition name="toast">
+  <div v-if="showToast" class="custom-toast">
+    <span class="toast-icon">✓</span>
+
+    <span>{{ toastMessage }}</span>
+
+    <button @click="showToast = false">×</button>
+  </div>
+</transition>
+  </div>
+
+  <div class="pill-actions">
+    <button class="action-btn" @click.stop="toggleEditSocial(social)">✎</button>
+    <button class="action-btn delete" @click.stop="removeSocialLink(index)">🗑</button>
+  </div>
+</div>
+
+<button class="btn-dashed-add" @click="addSocialLink">
+  + ADD NEW SOCIAL MEDIA
+</button>
         </div>
       </div>
 
-      <div class="section-card" :class="{ 'is-open': activeSections.contact }">
-        <div class="section-header" @click="toggleSection('contact')">
-          <h2 class="serif-card-title">Contact Information</h2>
-          <span class="arrow-toggle">▼</span>
-        </div>
-        <div class="section-body">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Email Address</label>
-              <input type="email" class="admin-input" />
-            </div>
-            <div class="form-group">
-              <label>Phone Number</label>
-              <input type="text" class="admin-input" />
-            </div>
-          </div>
-          <div class="form-group mt-4">
-            <label>Boutique Address</label>
-            <textarea class="admin-textarea" rows="3"></textarea>
-          </div>
-        </div>
+     <div class="section-card" :class="{ 'is-open': activeSections.contact }">
+  <div class="section-header" @click="toggleSection('contact')">
+    <h2 class="serif-card-title">Contact Information</h2>
+    <span class="arrow-toggle">▼</span>
+  </div>
+
+  <div class="section-body">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input
+          v-model="form.contact_email"
+          type="email"
+          class="admin-input"
+        />
       </div>
 
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input
+          v-model="form.contact_phone"
+          type="text"
+          class="admin-input"
+        />
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Email Note</label>
+        <input
+          v-model="form.contact_email_note"
+          type="text"
+          class="admin-input"
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Phone Note</label>
+        <input
+          v-model="form.contact_phone_note"
+          type="text"
+          class="admin-input"
+        />
+      </div>
+    </div>
+
+    <div class="form-group mt-4">
+      <label>Boutique Address</label>
+      <textarea
+        v-model="form.contact_address"
+        class="admin-textarea"
+        rows="3"
+      ></textarea>
+    </div>
+
+    <div class="form-group mt-4">
+      <label>Address Note</label>
+      <input
+        v-model="form.contact_address_note"
+        type="text"
+        class="admin-input"
+      />
+    </div>
+  </div>
+</div>
       <div class="section-card" :class="{ 'is-open': activeSections.size }">
         <div class="section-header" @click="toggleSection('size')">
           <h2 class="serif-card-title">Size Guide</h2>
@@ -79,25 +172,37 @@
           <h4 class="sub-label">Page Header</h4>
           <div class="form-group">
             <label>Subtitle</label>
-            <input type="text" class="admin-input" value="Sizing & Fit" />
+            <input v-model="form.size_label" type="text" class="admin-input" />
           </div>
           <div class="form-group">
             <label>Main Title</label>
-            <input type="text" class="admin-input" value="Find Your Perfect Fit" />
+            <input v-model="form.size_title" type="text" class="admin-input" />
           </div>
           <div class="form-group">
             <label>Short Description</label>
-            <textarea class="admin-textarea">Our garments are crafted with precision...</textarea>
+            <textarea v-model="form.size_description" class="admin-textarea"></textarea>
           </div>
 
           <h4 class="sub-label mt-6">How to Measure</h4>
           <div class="measure-grid">
-            <div v-for="item in ['Ruler', 'Tape', 'Frame']" :key="item" class="measure-card">
-              <div class="icon-circle mb-2">📏</div>
-              <label class="center">{{ item }}</label>
-              <input type="text" class="admin-input center" value="Bust" />
-              <textarea class="admin-textarea mt-2" placeholder="Description..."></textarea>
-            </div>
+            <div
+  v-for="(item, index) in measureSteps"
+  :key="index"
+  class="measure-card"
+>
+  <div class="icon-circle mb-2">📏</div>
+
+  <input
+    v-model="item.title"
+    type="text"
+    class="admin-input center"
+  />
+
+  <textarea
+    v-model="item.desc"
+    class="admin-textarea mt-2"
+  ></textarea>
+</div>
           </div>
 
           <h4 class="sub-label mt-6">Size Table Editor</h4>
@@ -109,42 +214,62 @@
                   <th>TOP LENGTH (CM)</th>
                   <th>SLEEVE LENGTH (CM)</th>
                   <th>BUST (CM)</th>
-                  <th class="text-gold">+ ADD COL</th>
+                  
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="row in tableData" :key="row.size">
-                  <td>{{ row.size }}</td>
-                  <td>{{ row.top }}</td>
-                  <td>{{ row.sleeve }}</td>
-                  <td>{{ row.bust }}</td>
-                  <td></td>
-                </tr>
+                <tr v-for="(row, index) in sizeTopsTable" :key="index">
+  <td>
+    <input v-model="row.size" class="table-input" />
+  </td>
+  <td>
+    <input v-model="row.length" class="table-input" />
+  </td>
+  <td>
+    <input v-model="row.sleeve" class="table-input" />
+  </td>
+  <td>
+    <input v-model="row.bust" class="table-input" />
+  </td>
+  <td> <button class="action-btn delete" @click="removeSizeRow(index)">🗑</button></td>
+</tr>
               </tbody>
             </table>
-            <button class="text-gold mt-2">+ ADD ROW</button>
+            <button class="text-gold mt-2" @click="addSizeRow">+ ADD ROW</button>
           </div>
         </div>
       </div>
 
       <div class="section-card" :class="{ 'is-open': activeSections.faq }">
         <div class="section-header" @click="toggleSection('faq')">
-          <h2 class="serif-card-title">Faq Management</h2>
+          <h2 class="serif-card-title">FAQ Management</h2>
           <span class="arrow-toggle">▼</span>
         </div>
         <div class="section-body">
-          <div v-for="i in 5" :key="i" class="faq-row">
-            <div class="drag-handle">⠿</div>
-            <div class="faq-content">
-              <p class="faq-q">How can I track my order?</p>
-              <p class="faq-a">
-                Once your order is dispatched, you will receive an email containing the tracking
-                number...
-              </p>
-            </div>
-            <button class="action-btn">🗑</button>
-          </div>
-          <button class="btn-dashed-add mt-4">+ ADD NEW FAQ</button>
+          <div v-for="(faq, index) in faqItems" :key="index" class="faq-row">
+  <div class="drag-handle">⠿</div>
+
+  <div class="faq-content">
+    <input
+      v-model="faq.question"
+      class="faq-input faq-q"
+      placeholder="FAQ question"
+    />
+
+    <textarea
+      v-model="faq.answer"
+      class="faq-input faq-a"
+      placeholder="FAQ answer"
+      rows="2"
+    ></textarea>
+  </div>
+
+  <button class="action-btn delete" @click="removeFaq(index)">🗑</button>
+</div>
+
+<button class="btn-dashed-add mt-4" @click="addFaq">
+  + ADD NEW FAQ
+</button>
         </div>
       </div>
     </div>
@@ -159,7 +284,10 @@
 </template>
 
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
+import { Save } from "lucide-vue-next";
+
+const API_BASE = "https://sheena-backend-production.up.railway.app/api";
 
 // State untuk mengatur accordion mana yang terbuka
 const activeSections = reactive({
@@ -170,15 +298,200 @@ const activeSections = reactive({
   faq: false,
 });
 
+const toastMessage = ref("");
+const showToast = ref(false);
+
+const triggerToast = (message) => {
+  toastMessage.value = message;
+  showToast.value = true;
+
+  setTimeout(() => {
+    showToast.value = false;
+  }, 2500);
+};
+
 const toggleSection = (key) => {
   activeSections[key] = !activeSections[key];
 };
 
-const tableData = ref([
-  { size: "S", top: 53, sleeve: 63, bust: 94 },
-  { size: "M", top: 54, sleeve: 63, bust: 98 },
-  { size: "L", top: 56, sleeve: 64, bust: 102 },
+const socialLinks = ref([
+  {
+    platform: "Instagram",
+    url: "https://www.instagram.com/shnco___/",
+    isEditing: false,
+  },
+  {
+    platform: "Shopee",
+    url: "https://shopee.co.id/shnco___",
+    isEditing: false,
+  },
+  {
+    platform: "Tiktok",
+    url: "https://www.tiktok.com/@meetthesheena",
+    isEditing: false,
+  },
 ]);
+
+const addSocialLink = () => {
+  socialLinks.value.push({
+    platform: "New Social",
+    url: "",
+    isEditing: true,
+  });
+};
+
+const removeSocialLink = (index) => {
+  socialLinks.value.splice(index, 1);
+};
+
+const toggleEditSocial = (social) => {
+  social.isEditing = !social.isEditing;
+};
+
+const form = ref({
+  footer_about_title: "ABOUT SHEENA",
+  footer_about_desc:
+    "Crafting timeless elegance since 1985. Each piece tells a story of exceptional craftsmanship and refined design.",
+
+  footer_instagram_url: "https://www.instagram.com/shnco___/",
+  footer_shopee_url: "https://shopee.co.id/shnco___",
+  footer_tiktok_url: "https://www.tiktok.com/@meetthesheena",
+
+  contact_email: "meetthesheena@gmail.com",
+  contact_email_note: "Response within 24 hours",
+  contact_phone: "+62 81311983690",
+  contact_phone_note: "Mon-Fri, 9:00 AM - 6:00 PM (GMT+7)",
+  contact_address: "123 Luxury Lane",
+  contact_address_note: "Jakarta, Indonesia",
+
+  size_label: "FIND YOUR FIT",
+  size_title: "Size Guide",
+  size_description: "Use our detailed size charts to find your perfect fit",
+
+  size_measure_steps: JSON.stringify([
+  {
+    title: "BUST",
+    desc: "Measure around the fullest part of your bust, keeping the tape parallel to the floor.",
+  },
+  {
+    title: "WAIST",
+    desc: "Measure around the narrowest part of your waist, typically just above your belly button.",
+  },
+  {
+    title: "HIPS",
+    desc: "Measure around the fullest part of your hips, approximately 20cm below your waist.",
+  },
+]),
+
+size_tops_table: JSON.stringify([
+  { size: "S", length: "53", sleeve: "63", bust: "94" },
+  { size: "M", length: "54", sleeve: "63", bust: "98" },
+  { size: "L", length: "55", sleeve: "64", bust: "102" },
+  
+]),
+});
+
+const fetchContent = async () => {
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  const result = await response.json();
+
+  form.value = {
+    ...form.value,
+    ...(result.data || {}),
+  };
+
+  if (form.value.footer_social_links) {
+    socialLinks.value = JSON.parse(form.value.footer_social_links).map((item) => ({
+      ...item,
+      isEditing: false,
+    }));
+  }
+
+  if (form.value.size_measure_steps) {
+    measureSteps.value = JSON.parse(form.value.size_measure_steps);
+  }
+  if (form.value.size_tops_table) {
+  sizeTopsTable.value = JSON.parse(form.value.size_tops_table);
+  }
+  if (form.value.footer_faq_items) {
+  faqItems.value = JSON.parse(form.value.footer_faq_items);
+}
+};
+
+const saveContent = async () => {
+  form.value.footer_social_links = JSON.stringify(
+    socialLinks.value.map(({ platform, url }) => ({
+      platform,
+      url,
+    }))
+  );
+
+  form.value.size_measure_steps = JSON.stringify(measureSteps.value);
+  form.value.size_tops_table = JSON.stringify(sizeTopsTable.value);
+  form.value.footer_faq_items = JSON.stringify(faqItems.value);
+
+  const response = await fetch(`${API_BASE}/admin/home-content`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+    },
+    body: JSON.stringify(form.value),
+  });
+
+  const result = await response.json();
+  triggerToast("Footer content updated successfully");
+
+  await fetchContent();
+};
+
+const sizeTopsTable = ref([
+  { size: "S", length: "53", sleeve: "63", bust: "94" },
+  { size: "M", length: "54", sleeve: "63", bust: "98" },
+  { size: "L", length: "55", sleeve: "64", bust: "102" },
+]);
+const measureSteps = ref([]);
+
+const faqItems = ref([
+  {
+    question: "How can I track my order?",
+    answer:
+      "Once your order is dispatched, you will receive an email containing the tracking number.",
+  },
+]);
+
+const addSizeRow = () => {
+  sizeTopsTable.value.push({
+    size: "",
+    length: "",
+    sleeve: "",
+    bust: "",
+  });
+};
+
+const removeSizeRow = (index) => {
+  sizeTopsTable.value.splice(index, 1);
+};
+
+const addFaq = () => {
+  faqItems.value.push({
+    question: "",
+    answer: "",
+  });
+};
+
+const removeFaq = (index) => {
+  faqItems.value.splice(index, 1);
+};
+
+onMounted(fetchContent);
+
 </script>
 
 <style scoped>
@@ -208,6 +521,11 @@ const tableData = ref([
 .subtitle {
   color: #aaa;
   font-size: 14px;
+}
+
+.save-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .btn-edit-data {
@@ -467,5 +785,114 @@ label {
   font-size: 12px;
   color: #7a8ba3;
   line-height: 1.6;
+}
+
+.social-input {
+  max-width: 360px;
+  margin-left: 12px;
+}
+
+.social-name-input {
+  width: 140px;
+}
+
+.social-url-input {
+  width: 360px;
+}
+
+.table-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  outline: none;
+}
+
+.faq-content {
+  flex: 1;
+}
+
+.faq-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  resize: none;
+}
+
+.faq-input.faq-q {
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.faq-input.faq-a {
+  font-size: 12px;
+  color: #888;
+}
+
+.custom-toast {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  z-index: 9999;
+
+  min-width: 380px;
+
+  background: white;
+  border: 1px solid #eee;
+
+  padding: 18px 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  font-family: "FONTSPRING DEMO - The Seasons";
+  font-size: 16px;
+  color: #1a1a1a;
+}
+
+.toast-icon {
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+  border: 1px solid #8c6a43;
+
+  color: #8c6a43;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 14px;
+}
+
+.custom-toast button {
+  margin-left: auto;
+
+  background: transparent;
+  border: none;
+
+  color: #bbb;
+
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.toast-enter-active,
+.toast-leave-active {
+  transition: all 0.25s ease;
+}
+
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>
