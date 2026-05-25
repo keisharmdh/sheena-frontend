@@ -1,11 +1,11 @@
 <template>
   <!-- SECTION 1 -->
   <section
-  class="overlay"
-  :style="{
-    backgroundImage: `url(${homeContent.hero_image ? BASE_URL + homeContent.hero_image : '/IMG1.png'})`
-  }"
->
+    class="overlay"
+    :style="{
+      backgroundImage: `url(${homeContent.hero_image ? BASE_URL + homeContent.hero_image : '/IMG1.png'})`,
+    }"
+  >
     <div class="overlay-content">
       <p>{{ homeContent.hero_label || "SPRING / SUMMER 2026" }}</p>
 
@@ -13,14 +13,16 @@
 
       <button @click="scrollToNewCollection">
         {{ homeContent.hero_button || "Discover Collection" }}
-</button>
+      </button>
     </div>
   </section>
 
   <!-- SECTION 2 -->
   <section class="grid">
     <div class="grid-left">
-      <img :src="homeContent.section2_image_1 ? BASE_URL + homeContent.section2_image_1 : '/IMG2.png'" />
+      <img
+        :src="homeContent.section2_image_1 ? BASE_URL + homeContent.section2_image_1 : '/IMG2.png'"
+      />
     </div>
 
     <div class="grid-right">
@@ -29,20 +31,37 @@
           <ul>
             <li>{{ homeContent.section2_label || "COLLECTION" }}</li>
             <li>{{ homeContent.section2_title || "Quiet Luxury" }}</li>
-            <li>{{ homeContent.section2_description || "Timeless elegance meets contemporary sophistication" }}</li>
+            <li>
+              {{
+                homeContent.section2_description ||
+                "Timeless elegance meets contemporary sophistication"
+              }}
+            </li>
           </ul>
         </div>
         <div class="box-2">
-          <img :src="homeContent.section2_image_2 ? BASE_URL + homeContent.section2_image_2 : '/IMG3.png'" />
+          <img
+            :src="
+              homeContent.section2_image_2 ? BASE_URL + homeContent.section2_image_2 : '/IMG3.png'
+            "
+          />
         </div>
       </div>
 
       <div class="btm">
         <div class="box-3">
-          <img :src="homeContent.section2_image_3 ? BASE_URL + homeContent.section2_image_3 : '/IMG4.png'" />
+          <img
+            :src="
+              homeContent.section2_image_3 ? BASE_URL + homeContent.section2_image_3 : '/IMG4.png'
+            "
+          />
         </div>
         <div class="box-4">
-          <img :src="homeContent.section2_image_4 ? BASE_URL + homeContent.section2_image_4 : '/IMG5.png'" />
+          <img
+            :src="
+              homeContent.section2_image_4 ? BASE_URL + homeContent.section2_image_4 : '/IMG5.png'
+            "
+          />
         </div>
       </div>
     </div>
@@ -50,7 +69,11 @@
 
   <!-- SECTION 3 -->
   <section ref="newCollectionSection" class="section-new-collection">
-    <section id="new-collection" ref="newCollectionSection" class="section-new-collection"></section>
+    <section
+      id="new-collection"
+      ref="newCollectionSection"
+      class="section-new-collection"
+    ></section>
     <div class="section-header">
       <p class="label">{{ homeContent.section3_label || "DISCOVER" }}</p>
       <h2 class="serif-title">{{ homeContent.section3_title || "New Collection" }}</h2>
@@ -67,9 +90,7 @@
           <div class="product-info">
             <h3>{{ product.name }}</h3>
             <p>Rp {{ product.price.toLocaleString("id-ID") }}</p>
-            <button class="btn-add-bag" @click="openQuickView(product)">
-              Quick View
-            </button>
+            <button class="btn-add-bag" @click="openQuickView(product)">Quick View</button>
           </div>
         </div>
       </div>
@@ -78,8 +99,8 @@
     </div>
     <div class="view-all-container">
       <router-link to="/shop" class="btn-outline">
-    {{ homeContent.section3_button || "View All Products" }}
-  </router-link>
+        {{ homeContent.section3_button || "View All Products" }}
+      </router-link>
     </div>
   </section>
 
@@ -89,15 +110,18 @@
       <p class="label">{{ homeContent.promo_label || "FEATURED" }}</p>
       <h2 class="serif-title">{{ homeContent.promo_title || "The Essence of Elegance" }}</h2>
       <p class="description">
-        {{ homeContent.promo_description || "Curated pieces that embody timeless sophistication. Each garment is thoughtfully designed to elevate your wardrobe with understated luxury and enduring style." }}
+        {{
+          homeContent.promo_description ||
+          "Curated pieces that embody timeless sophistication. Each garment is thoughtfully designed to elevate your wardrobe with understated luxury and enduring style."
+        }}
       </p>
       <RouterLink to="/shop" class="btn-outline">View Collection</RouterLink>
     </div>
     <div class="feature-image">
       <img
-  :src="homeContent.promo_image ? BASE_URL + homeContent.promo_image : '/Katalog6.png'"
-  alt="Featured"
-/>
+        :src="homeContent.promo_image ? BASE_URL + homeContent.promo_image : '/Katalog6.png'"
+        alt="Featured"
+      />
     </div>
   </section>
 
@@ -150,10 +174,10 @@
   </section>
 
   <QuickView
-  :isOpen="isQuickViewOpen"
-  :product="selectedProduct"
-  @close="isQuickViewOpen = false"
-/>
+    :isOpen="isQuickViewOpen"
+    :product="selectedProduct"
+    @close="isQuickViewOpen = false"
+  />
 </template>
 
 <script setup>
@@ -163,7 +187,6 @@ import QuickView from "../../components/QuickViewPopup.vue";
 
 const API_BASE = "https://sheena-backend-production.up.railway.app/api";
 const BASE_URL = "https://sheena-backend-production.up.railway.app";
-
 
 const cart = useCartStore();
 const newCollectionSection = ref(null);
@@ -179,9 +202,7 @@ const scrollToNewCollection = () => {
 };
 
 const cleanProductName = (name) => {
-  return name
-    ?.replace(/Meet The Sheena\s*[-—]?\s*/gi, "")
-    ?.trim();
+  return name?.replace(/Meet The Sheena\s*[-—]?\s*/gi, "")?.trim();
 };
 
 const fetchNewArrivals = async () => {
@@ -193,34 +214,31 @@ const fetchNewArrivals = async () => {
     });
 
     const result = await response.json();
-    const productList = Array.isArray(result.data)
-      ? result.data
-      : result.data?.data || [];
+    const productList = Array.isArray(result.data) ? result.data : result.data?.data || [];
 
     newArrivals.value = productList.slice(0, 5).map((product) => {
       const listings = product.product_listings || [];
-      const validPriceListing =
-        listings.find((item) => Number(item.price) > 0) || listings[0];
+      const validPriceListing = listings.find((item) => Number(item.price) > 0) || listings[0];
 
       return {
-  id: product.id_product,
-  name: cleanProductName(product.product_name),
-  collection: "New Collection",
-  price: Number(validPriceListing?.price || 0),
-  image: product.product_image || "https://placehold.co/400x500?text=Sheena",
-  images: [product.product_image || "https://placehold.co/400x500?text=Sheena"],
-  variants: listings.map((item) => ({
-    id: item.id_listing,
-    name: item.variant_name,
-    price: Number(item.price || 0),
-    stock: Number(item.stock || 0),
-    url: item.product_url,
-  })),
-  shopeeUrl: validPriceListing?.product_url || listings[0]?.product_url || "",
-  desc: "Product data is synced from Shopee.",
-  material: "-",
-  details: [],
-};
+        id: product.id_product,
+        name: cleanProductName(product.product_name),
+        collection: "New Collection",
+        price: Number(validPriceListing?.price || 0),
+        image: product.product_image || "https://placehold.co/400x500?text=Sheena",
+        images: [product.product_image || "https://placehold.co/400x500?text=Sheena"],
+        variants: listings.map((item) => ({
+          id: item.id_listing,
+          name: item.variant_name,
+          price: Number(item.price || 0),
+          stock: Number(item.stock || 0),
+          url: item.product_url,
+        })),
+        shopeeUrl: validPriceListing?.product_url || listings[0]?.product_url || "",
+        desc: "Product data is synced from Shopee.",
+        material: "-",
+        details: [],
+      };
     });
   } catch (error) {
     console.error("Fetch new arrivals error:", error);
@@ -331,7 +349,6 @@ onMounted(() => {
   background: #fff;
 }
 
-
 /* KANAN (Tempat Teks dan Foto-foto lainnya) */
 .grid-right {
   display: flex;
@@ -351,7 +368,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
 }
-
 
 .box-1 ul {
   list-style: none;
@@ -422,8 +438,6 @@ onMounted(() => {
   background: #fff;
 }
 
-
-
 /* --- SECTION 3: NEW COLLECTION (SLIDER) --- */
 .section-new-collection {
   padding: 100px 40px;
@@ -490,6 +504,7 @@ onMounted(() => {
 
 .product-info p {
   font-size: 12px;
+  font-family: "FONTSPRING DEMO - The Seasons";
 }
 
 .btn-add-bag {
