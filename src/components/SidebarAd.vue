@@ -197,7 +197,7 @@
 
 <script setup>
 import { ref, computed } from "vue"; //
-import { useRoute, useRouter } from "vue-router"; 
+import { useRoute, useRouter } from "vue-router";
 import { Home, ShoppingBag, Info, PanelBottom } from "lucide-vue-next";
 
 const route = useRoute();
@@ -247,8 +247,9 @@ const handleLogout = () => {
   left: 0; /* Mulai dari titik 0 */
   z-index: 1000;
   /* Sembunyikan dengan menggeser dirinya sendiri ke kiri sejauh lebarnya */
-  transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /*transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);*/
+  overflow-x: hidden;
 }
 
 /* Ketika class 'open' ada, geser ke posisi terlihat */
@@ -394,6 +395,12 @@ const handleLogout = () => {
 @media (max-width: 768px) {
   .close-mobile-btn {
     display: block;
+  }
+  .sidebar-container {
+    transform: translateX(-100%);
+  }
+  .sidebar-container.open {
+    transform: translateX(0px);
   }
 }
 
