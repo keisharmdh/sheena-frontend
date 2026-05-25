@@ -247,8 +247,8 @@ const handleLogout = () => {
   left: 0; /* Mulai dari titik 0 */
   z-index: 1000;
   /* Sembunyikan dengan menggeser dirinya sendiri ke kiri sejauh lebarnya */
-  /*transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);*/
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow-x: hidden;
 }
 
