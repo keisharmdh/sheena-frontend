@@ -303,6 +303,7 @@ const handleLogout = () => {
   background: none;
   border: none;
   width: 100%;
+  box-sizing: border-box;
   color: #999;
   border-radius: 12px;
   transition: all 0.3s ease;
