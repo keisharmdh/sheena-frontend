@@ -109,11 +109,19 @@
                 @input="validateEmail"
                 placeholder="example@domain.com"
               />
+              <span v-if="errors.email" class="error-text">{{ errors.email }}</span>
             </div>
 
             <div class="form-group">
               <label>Phone Number</label>
-              <input v-model="form.contact_phone" type="text" class="admin-input" />
+              <input
+                v-model="form.contact_phone"
+                type="text"
+                class="admin-input"
+                :class="{ 'input-error': errors.phone }"
+                @input="cleanPhoneInput"
+                placeholder="Hanya angka (e.g. 081311983690)"
+              />
             </div>
           </div>
 
@@ -448,6 +456,79 @@ const addFaq = () => {
 
 const removeFaq = (index) => {
   faqItems.value.splice(index, 1);
+};
+
+//FIX BUG EMIAL & PHONE VALIDATION
+// 1. Deklarasikan reactive state untuk menampung error
+const errors = reactive({
+  email: "",
+  phone: "",
+});
+
+// Memastikan input nomor telepon HANYA angka (menghapus otomatis karakter selain angka/plus di awal)
+const cleanPhoneInput = () => {
+  // Mengizinkan angka, jika ingin mengizinkan tanda '+' di awal bisa gunakan: .replace(/[^\d+]/g, '')
+  form.value.contact_phone = form.value.contact_phone.replace(/\D/g, "");
+
+  if (!form.value.contact_phone) {
+    errors.phone = "Nomor telepon wajib diisi";
+  } else {
+    errors.phone = "";
+  }
+};
+
+// Validasi format email secara realtime saat mengetik
+const validateEmail = () => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!form.value.contact_email) {
+    errors.email = "Email wajib diisi";
+  } else if (!emailRegex.test(form.value.contact_email)) {
+    errors.email = "Format email tidak valid (harus mengandung '@' dan domain)";
+  } else {
+    errors.email = "";
+  }
+};
+
+const saveContent = async () => {
+  // Jalankan validasi akhir sebelum save
+  validateEmail();
+  cleanPhoneInput();
+
+  // Jika ada error, hentikan proses save dan beri peringatan
+  if (errors.email || errors.phone) {
+    triggerToast("Gagal menyimpan: Mohon perbaiki format input yang salah");
+    return;
+  }
+
+  form.value.footer_social_links = JSON.stringify(
+    socialLinks.value.map(({ platform, url }) => ({
+      platform,
+      url,
+    })),
+  );
+
+  form.value.size_measure_steps = JSON.stringify(measureSteps.value);
+  form.value.size_tops_table = JSON.stringify(sizeTopsTable.value);
+  form.value.footer_faq_items = JSON.stringify(faqItems.value);
+
+  try {
+    const response = await fetch(`${API_BASE}/admin/home-content`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+      },
+      body: JSON.stringify(form.value),
+    });
+
+    const result = await response.json();
+    triggerToast("Footer content updated successfully");
+    await fetchContent();
+  } catch (error) {
+    console.error(error);
+    triggerToast("Terjadi kesalahan sistem saat menyimpan");
+  }
 };
 
 onMounted(fetchContent);
@@ -853,5 +934,19 @@ label {
 .toast-leave-to {
   opacity: 0;
   transform: translateY(-10px);
+}
+
+/* Style tambahan untuk feedback validasi */
+.admin-input.input-error {
+  border-color: #e74c3c !important;
+  background-color: #fff6f5;
+}
+
+.error-text {
+  color: #e74c3c;
+  font-size: 11px;
+  margin-top: 4px;
+  display: block;
+  font-weight: 500;
 }
 </style>
