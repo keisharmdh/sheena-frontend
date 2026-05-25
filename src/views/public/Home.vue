@@ -501,6 +501,7 @@ onMounted(() => {
   line-height: 1.4;
   min-height: 55px;
   font-family: "FONTSPRING DEMO - The Seasons";
+  font-weight: 400;
 }
 
 .product-info p {
