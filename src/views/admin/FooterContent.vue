@@ -392,6 +392,15 @@ const fetchContent = async () => {
 };
 
 const saveContent = async () => {
+  validateEmail();
+  cleanPhoneInput();
+
+  // 2. Guard Clause: Jika ada error pada email atau phone, kunci fungsi di sini
+  if (errors.email || errors.phone) {
+    triggerToast("Gagal menyimpan: Mohon perbaiki format input yang salah");
+    return; // Berhenti dan tidak akan mengirim data ke API
+  }
+
   form.value.footer_social_links = JSON.stringify(
     socialLinks.value.map(({ platform, url }) => ({
       platform,
@@ -489,47 +498,47 @@ const validateEmail = () => {
   }
 };
 
-const saveContent = async () => {
-  // Jalankan validasi akhir sebelum save
-  validateEmail();
-  cleanPhoneInput();
+// const saveContent = async () => {
+//   // Jalankan validasi akhir sebelum save
+//   validateEmail();
+//   cleanPhoneInput();
 
-  // Jika ada error, hentikan proses save dan beri peringatan
-  if (errors.email || errors.phone) {
-    triggerToast("Gagal menyimpan: Mohon perbaiki format input yang salah");
-    return;
-  }
+//   // Jika ada error, hentikan proses save dan beri peringatan
+//   if (errors.email || errors.phone) {
+//     triggerToast("Gagal menyimpan: Mohon perbaiki format input yang salah");
+//     return;
+//   }
 
-  form.value.footer_social_links = JSON.stringify(
-    socialLinks.value.map(({ platform, url }) => ({
-      platform,
-      url,
-    })),
-  );
+//   form.value.footer_social_links = JSON.stringify(
+//     socialLinks.value.map(({ platform, url }) => ({
+//       platform,
+//       url,
+//     })),
+//   );
 
-  form.value.size_measure_steps = JSON.stringify(measureSteps.value);
-  form.value.size_tops_table = JSON.stringify(sizeTopsTable.value);
-  form.value.footer_faq_items = JSON.stringify(faqItems.value);
+//   form.value.size_measure_steps = JSON.stringify(measureSteps.value);
+//   form.value.size_tops_table = JSON.stringify(sizeTopsTable.value);
+//   form.value.footer_faq_items = JSON.stringify(faqItems.value);
 
-  try {
-    const response = await fetch(`${API_BASE}/admin/home-content`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
-      },
-      body: JSON.stringify(form.value),
-    });
+//   try {
+//     const response = await fetch(`${API_BASE}/admin/home-content`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//         Accept: "application/json",
+//         Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+//       },
+//       body: JSON.stringify(form.value),
+//     });
 
-    const result = await response.json();
-    triggerToast("Footer content updated successfully");
-    await fetchContent();
-  } catch (error) {
-    console.error(error);
-    triggerToast("Terjadi kesalahan sistem saat menyimpan");
-  }
-};
+//     const result = await response.json();
+//     triggerToast("Footer content updated successfully");
+//     await fetchContent();
+//   } catch (error) {
+//     console.error(error);
+//     triggerToast("Terjadi kesalahan sistem saat menyimpan");
+//   }
+// };
 
 onMounted(fetchContent);
 </script>
