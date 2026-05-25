@@ -109,7 +109,6 @@
                 @input="validateEmail"
                 placeholder="example@domain.com"
               />
-              <span v-if="errors.email" class="error-text">{{ errors.email }}</span>
             </div>
 
             <div class="form-group">
