@@ -500,7 +500,7 @@ onMounted(() => {
   font-size: 13px;
   line-height: 1.5;
   /* min-height: 55px; */
-  font-family: "FONTSPRING DEMO - The Seasons";
+  font-family: "Inter", sans-serif;
   font-weight: 400;
 }
 
