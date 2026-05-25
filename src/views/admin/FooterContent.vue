@@ -7,7 +7,7 @@
       </div>
       <button class="btn-edit-data" @click="saveContent">
         <Save class="save-icon" />
-  Save Data
+        Save Data
       </button>
     </header>
 
@@ -21,11 +21,11 @@
           <div class="form-group">
             <label>Footer Title</label>
             <input
-  v-model="form.footer_about_title"
-  type="text"
-  class="admin-input"
-  placeholder="ABOUT SHEENA"
-/>
+              v-model="form.footer_about_title"
+              type="text"
+              class="admin-input"
+              placeholder="ABOUT SHEENA"
+            />
           </div>
           <div class="form-group">
             <label>Brand Description</label>
@@ -40,129 +40,115 @@
           <span class="arrow-toggle">▼</span>
         </div>
         <div class="section-body">
-         <div
-  v-for="(social, index) in socialLinks"
-  :key="index"
-  class="pill-item"
->
-  <div class="pill-left">
-    <div class="icon-circle">🔗</div>
+          <div v-for="(social, index) in socialLinks" :key="index" class="pill-item">
+            <div class="pill-left">
+              <div class="icon-circle">🔗</div>
 
-    <template v-if="social.isEditing">
-      <input
-        v-model="social.platform"
-        type="text"
-        class="admin-input social-name-input"
-        placeholder="Platform name"
-      />
+              <template v-if="social.isEditing">
+                <input
+                  v-model="social.platform"
+                  type="text"
+                  class="admin-input social-name-input"
+                  placeholder="Platform name"
+                />
 
-      <input
-        v-model="social.url"
-        type="text"
-        class="admin-input social-url-input"
-        placeholder="Social media URL"
-      />
-    </template>
+                <input
+                  v-model="social.url"
+                  type="text"
+                  class="admin-input social-url-input"
+                  placeholder="Social media URL"
+                />
+              </template>
 
-    <template v-else>
-      <span class="platform-name">
-        {{ social.platform }}
-      </span>
+              <template v-else>
+                <span class="platform-name">
+                  {{ social.platform }}
+                </span>
 
-      <span class="url-text">
-        {{ social.url }}
-      </span>
-    </template>
+                <span class="url-text">
+                  {{ social.url }}
+                </span>
+              </template>
 
-    <transition name="toast">
-  <div v-if="showToast" class="custom-toast">
-    <span class="toast-icon">✓</span>
+              <transition name="toast">
+                <div v-if="showToast" class="custom-toast">
+                  <span class="toast-icon">✓</span>
 
-    <span>{{ toastMessage }}</span>
+                  <span>{{ toastMessage }}</span>
 
-    <button @click="showToast = false">×</button>
-  </div>
-</transition>
-  </div>
+                  <button @click="showToast = false">×</button>
+                </div>
+              </transition>
+            </div>
 
-  <div class="pill-actions">
-    <button class="action-btn" @click.stop="toggleEditSocial(social)">✎</button>
-    <button class="action-btn delete" @click.stop="removeSocialLink(index)">🗑</button>
-  </div>
-</div>
+            <div class="pill-actions">
+              <button class="action-btn" @click.stop="toggleEditSocial(social)">✎</button>
+              <button class="action-btn delete" @click.stop="removeSocialLink(index)">🗑</button>
+            </div>
+          </div>
 
-<button class="btn-dashed-add" @click="addSocialLink">
-  + ADD NEW SOCIAL MEDIA
-</button>
+          <button class="btn-dashed-add" @click="addSocialLink">+ ADD NEW SOCIAL MEDIA</button>
         </div>
       </div>
 
-     <div class="section-card" :class="{ 'is-open': activeSections.contact }">
-  <div class="section-header" @click="toggleSection('contact')">
-    <h2 class="serif-card-title">Contact Information</h2>
-    <span class="arrow-toggle">▼</span>
-  </div>
+      <div class="section-card" :class="{ 'is-open': activeSections.contact }">
+        <div class="section-header" @click="toggleSection('contact')">
+          <h2 class="serif-card-title">Contact Information</h2>
+          <span class="arrow-toggle">▼</span>
+        </div>
 
-  <div class="section-body">
-    <div class="form-row">
-      <div class="form-group">
-        <label>Email Address</label>
-        <input
-          v-model="form.contact_email"
-          type="email"
-          class="admin-input"
-        />
+        <div class="section-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email Address</label>
+              <input
+                v-model="form.contact_email"
+                type="email"
+                class="admin-input"
+                :class="{ 'input-error': errors.email }"
+                @input="validateEmail"
+                placeholder="example@domain.com"
+              />
+              <span v-if="errors.email" class="error-text">{{ errors.email }}</span>
+            </div>
+
+            <div class="form-group">
+              <label>Phone Number</label>
+              <input
+                v-model="form.contact_phone"
+                type="text"
+                class="admin-input"
+                :class="{ 'input-error': errors.phone }"
+                @input="cleanPhoneInput"
+                placeholder="Hanya angka (e.g. 081311983690)"
+              />
+              <span v-if="errors.phone" class="error-text">{{ errors.phone }}</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Email Note</label>
+              <input v-model="form.contact_email_note" type="text" class="admin-input" />
+            </div>
+
+            <div class="form-group">
+              <label>Phone Note</label>
+              <input v-model="form.contact_phone_note" type="text" class="admin-input" />
+            </div>
+          </div>
+
+          <div class="form-group mt-4">
+            <label>Boutique Address</label>
+            <textarea v-model="form.contact_address" class="admin-textarea" rows="3"></textarea>
+          </div>
+
+          <div class="form-group mt-4">
+            <label>Address Note</label>
+            <input v-model="form.contact_address_note" type="text" class="admin-input" />
+          </div>
+        </div>
       </div>
-
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input
-          v-model="form.contact_phone"
-          type="text"
-          class="admin-input"
-        />
-      </div>
-    </div>
-
-    <div class="form-row">
-      <div class="form-group">
-        <label>Email Note</label>
-        <input
-          v-model="form.contact_email_note"
-          type="text"
-          class="admin-input"
-        />
-      </div>
-
-      <div class="form-group">
-        <label>Phone Note</label>
-        <input
-          v-model="form.contact_phone_note"
-          type="text"
-          class="admin-input"
-        />
-      </div>
-    </div>
-
-    <div class="form-group mt-4">
-      <label>Boutique Address</label>
-      <textarea
-        v-model="form.contact_address"
-        class="admin-textarea"
-        rows="3"
-      ></textarea>
-    </div>
-
-    <div class="form-group mt-4">
-      <label>Address Note</label>
-      <input
-        v-model="form.contact_address_note"
-        type="text"
-        class="admin-input"
-      />
-    </div>
-  </div>
-</div>
       <div class="section-card" :class="{ 'is-open': activeSections.size }">
         <div class="section-header" @click="toggleSection('size')">
           <h2 class="serif-card-title">Size Guide</h2>
@@ -185,24 +171,13 @@
 
           <h4 class="sub-label mt-6">How to Measure</h4>
           <div class="measure-grid">
-            <div
-  v-for="(item, index) in measureSteps"
-  :key="index"
-  class="measure-card"
->
-  <div class="icon-circle mb-2">📏</div>
+            <div v-for="(item, index) in measureSteps" :key="index" class="measure-card">
+              <div class="icon-circle mb-2">📏</div>
 
-  <input
-    v-model="item.title"
-    type="text"
-    class="admin-input center"
-  />
+              <input v-model="item.title" type="text" class="admin-input center" />
 
-  <textarea
-    v-model="item.desc"
-    class="admin-textarea mt-2"
-  ></textarea>
-</div>
+              <textarea v-model="item.desc" class="admin-textarea mt-2"></textarea>
+            </div>
           </div>
 
           <h4 class="sub-label mt-6">Size Table Editor</h4>
@@ -214,25 +189,26 @@
                   <th>TOP LENGTH (CM)</th>
                   <th>SLEEVE LENGTH (CM)</th>
                   <th>BUST (CM)</th>
-                  
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(row, index) in sizeTopsTable" :key="index">
-  <td>
-    <input v-model="row.size" class="table-input" />
-  </td>
-  <td>
-    <input v-model="row.length" class="table-input" />
-  </td>
-  <td>
-    <input v-model="row.sleeve" class="table-input" />
-  </td>
-  <td>
-    <input v-model="row.bust" class="table-input" />
-  </td>
-  <td> <button class="action-btn delete" @click="removeSizeRow(index)">🗑</button></td>
-</tr>
+                  <td>
+                    <input v-model="row.size" class="table-input" />
+                  </td>
+                  <td>
+                    <input v-model="row.length" class="table-input" />
+                  </td>
+                  <td>
+                    <input v-model="row.sleeve" class="table-input" />
+                  </td>
+                  <td>
+                    <input v-model="row.bust" class="table-input" />
+                  </td>
+                  <td>
+                    <button class="action-btn delete" @click="removeSizeRow(index)">🗑</button>
+                  </td>
+                </tr>
               </tbody>
             </table>
             <button class="text-gold mt-2" @click="addSizeRow">+ ADD ROW</button>
@@ -247,29 +223,23 @@
         </div>
         <div class="section-body">
           <div v-for="(faq, index) in faqItems" :key="index" class="faq-row">
-  <div class="drag-handle">⠿</div>
+            <div class="drag-handle">⠿</div>
 
-  <div class="faq-content">
-    <input
-      v-model="faq.question"
-      class="faq-input faq-q"
-      placeholder="FAQ question"
-    />
+            <div class="faq-content">
+              <input v-model="faq.question" class="faq-input faq-q" placeholder="FAQ question" />
 
-    <textarea
-      v-model="faq.answer"
-      class="faq-input faq-a"
-      placeholder="FAQ answer"
-      rows="2"
-    ></textarea>
-  </div>
+              <textarea
+                v-model="faq.answer"
+                class="faq-input faq-a"
+                placeholder="FAQ answer"
+                rows="2"
+              ></textarea>
+            </div>
 
-  <button class="action-btn delete" @click="removeFaq(index)">🗑</button>
-</div>
+            <button class="action-btn delete" @click="removeFaq(index)">🗑</button>
+          </div>
 
-<button class="btn-dashed-add mt-4" @click="addFaq">
-  + ADD NEW FAQ
-</button>
+          <button class="btn-dashed-add mt-4" @click="addFaq">+ ADD NEW FAQ</button>
         </div>
       </div>
     </div>
@@ -369,26 +339,25 @@ const form = ref({
   size_description: "Use our detailed size charts to find your perfect fit",
 
   size_measure_steps: JSON.stringify([
-  {
-    title: "BUST",
-    desc: "Measure around the fullest part of your bust, keeping the tape parallel to the floor.",
-  },
-  {
-    title: "WAIST",
-    desc: "Measure around the narrowest part of your waist, typically just above your belly button.",
-  },
-  {
-    title: "HIPS",
-    desc: "Measure around the fullest part of your hips, approximately 20cm below your waist.",
-  },
-]),
+    {
+      title: "BUST",
+      desc: "Measure around the fullest part of your bust, keeping the tape parallel to the floor.",
+    },
+    {
+      title: "WAIST",
+      desc: "Measure around the narrowest part of your waist, typically just above your belly button.",
+    },
+    {
+      title: "HIPS",
+      desc: "Measure around the fullest part of your hips, approximately 20cm below your waist.",
+    },
+  ]),
 
-size_tops_table: JSON.stringify([
-  { size: "S", length: "53", sleeve: "63", bust: "94" },
-  { size: "M", length: "54", sleeve: "63", bust: "98" },
-  { size: "L", length: "55", sleeve: "64", bust: "102" },
-  
-]),
+  size_tops_table: JSON.stringify([
+    { size: "S", length: "53", sleeve: "63", bust: "94" },
+    { size: "M", length: "54", sleeve: "63", bust: "98" },
+    { size: "L", length: "55", sleeve: "64", bust: "102" },
+  ]),
 });
 
 const fetchContent = async () => {
@@ -416,11 +385,11 @@ const fetchContent = async () => {
     measureSteps.value = JSON.parse(form.value.size_measure_steps);
   }
   if (form.value.size_tops_table) {
-  sizeTopsTable.value = JSON.parse(form.value.size_tops_table);
+    sizeTopsTable.value = JSON.parse(form.value.size_tops_table);
   }
   if (form.value.footer_faq_items) {
-  faqItems.value = JSON.parse(form.value.footer_faq_items);
-}
+    faqItems.value = JSON.parse(form.value.footer_faq_items);
+  }
 };
 
 const saveContent = async () => {
@@ -428,7 +397,7 @@ const saveContent = async () => {
     socialLinks.value.map(({ platform, url }) => ({
       platform,
       url,
-    }))
+    })),
   );
 
   form.value.size_measure_steps = JSON.stringify(measureSteps.value);
@@ -491,7 +460,6 @@ const removeFaq = (index) => {
 };
 
 onMounted(fetchContent);
-
 </script>
 
 <style scoped>
