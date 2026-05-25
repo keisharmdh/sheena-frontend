@@ -347,12 +347,12 @@ onMounted(() => {
 
 .grid-left img {
   width: 100%;
-  /* height: 640px;
+  /* height: 640px; */
   object-fit: contain;
-  object-position: center bottom; */
+  object-position: center bottom;
   height: auto;
   max-height: 640px;
-  object-fit: cover;
+  /* object-fit: cover; */
   display: block;
   background: #fff;
 }
