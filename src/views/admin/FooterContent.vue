@@ -101,7 +101,15 @@
           <div class="form-row">
             <div class="form-group">
               <label>Email Address</label>
-              <input v-model="form.contact_email" type="email" class="admin-input" />
+              <input
+                v-model="form.contact_email"
+                type="email"
+                class="admin-input"
+                :class="{ 'input-error': errors.email }"
+                @input="validateEmail"
+                placeholder="example@domain.com"
+              />
+              <span v-if="errors.email" class="error-text">{{ errors.email }}</span>
             </div>
 
             <div class="form-group">
