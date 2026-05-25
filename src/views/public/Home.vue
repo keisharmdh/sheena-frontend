@@ -327,10 +327,15 @@ onMounted(() => {
 /* Container Utama */
 .grid {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  /* grid-template-columns: 420px 1fr;
   gap: 60px;
   margin-left: 40px;
-  margin-right: 40px;
+  margin-right: 40px; */
+  grid-template-columns: 1fr 1.5fr;
+  gap: 40px;
+  margin: 0 auto;
+  padding: 0 40px;
+  max-width: 1400px;
   align-items: start;
 }
 
@@ -342,9 +347,12 @@ onMounted(() => {
 
 .grid-left img {
   width: 100%;
-  height: 640px;
+  /* height: 640px;
   object-fit: contain;
-  object-position: center bottom;
+  object-position: center bottom; */
+  height: auto;
+  max-height: 640px;
+  object-fit: cover;
   display: block;
   background: #fff;
 }
@@ -359,7 +367,8 @@ onMounted(() => {
 /* KANAN ATAS: Dibagi dua (Teks di kiri, Foto Grup di kanan) */
 .top {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  /* grid-template-columns: 240px 1fr; */
+  grid-template-columns: minmax(180px, auto) 1fr;
   gap: 20px;
 }
 
@@ -401,24 +410,26 @@ onMounted(() => {
 }
 
 .box-2 {
+  /* width: 100%;
+  height: 300px; */
   width: 100%;
-  height: 300px;
+  height: auto;
+  min-height: 250px;
+  max-height: 300px;
   overflow: hidden;
 }
 
 .box-2 img {
   width: 100%;
   height: 100%;
-
+  object-fit: cover;
+  object-position: center;
+  transform: none;
+  /* height: 100%;
   object-fit: contain;
-
-  /* INI YANG PENTING */
   object-position: top left;
-
   display: block;
-
-  /* biar agak melebar ke kiri */
-  transform: scale(1.12) translateX(-20px);
+  transform: scale(1.12) translateX(-20px);*/
 }
 
 /* KANAN BAWAH: Dua foto sejajar */
@@ -454,17 +465,19 @@ onMounted(() => {
   display: flex;
   align-items: center;
   margin: 50px 0;
-  padding: 0 50px;
+  padding: 0 20px;
 }
 
 .slider-container {
   display: flex;
-  justify-content: center;
-  gap: 24px;
+  /* justify-content: center; */
+  justify-content: flex-start;
+  gap: 20px;
   overflow-x: auto;
   scroll-behavior: smooth;
   padding-bottom: 20px;
   width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .slider-container::-webkit-scrollbar {
@@ -473,14 +486,21 @@ onMounted(() => {
 
 .product-item {
   min-width: 220px;
-  flex: 0 0 220px;
+  /* flex: 0 0 220px; */
+  flex: 0 0 calc(25% - 15px);
   text-align: left;
+  min-width: 200px;
 }
 
 .product-img {
   background: #fff;
-  width: 220px;
+  /* width: 220px;
   height: 300px;
+  overflow: hidden;
+  margin-bottom: 16px; */
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   margin-bottom: 16px;
 }
@@ -600,14 +620,18 @@ onMounted(() => {
 
 .picks-grid {
   display: grid;
-  grid-template-columns: 1.4fr 1fr; /* Kolom kiri lebih besar */
+  /*grid-template-columns: 1.4fr 1fr;*/ /* Kolom kiri lebih besar */
+  grid-template-columns: 1.2fr 1fr;
   gap: 40px;
   margin: 60px 0;
 }
 
 .pick-large .img-wrapper {
-  height: 850px; /* Sangat tinggi sesuai visual */
-  position: relative;
+  /* height: 850px; 
+  position: relative; */
+  height: auto;
+  aspect-ratio: 3 / 4;
+  max-height: 750px;
 }
 
 .pick-large .btn-overlay-add {
