@@ -55,28 +55,28 @@
             </tr>
           </thead>
           <tbody>
-  <template v-for="report in salesReports" :key="report.month_key">
-    <tr class="month-row">
-      <td>{{ report.month }}</td>
-      <td>Rp {{ formatRupiah(report.total_revenue) }}</td>
-      <td>{{ report.total_orders }}</td>
-      <td :class="report.growth >= 0 ? 'growth-positive' : 'growth-negative'">
-        {{ report.growth === null ? "-" : `${report.growth >= 0 ? "+" : ""}${report.growth}%` }}
-      </td>
-    </tr>
+            <template v-for="report in salesReports" :key="report.month_key">
+              <tr class="month-row">
+                <td>{{ report.month }}</td>
+                <td>Rp {{ formatRupiah(report.total_revenue) }}</td>
+                <td>{{ report.total_orders }}</td>
+                <td :class="report.growth >= 0 ? 'growth-positive' : 'growth-negative'">
+                  {{
+                    report.growth === null
+                      ? "-"
+                      : `${report.growth >= 0 ? "+" : ""}${report.growth}%`
+                  }}
+                </td>
+              </tr>
 
-    <tr
-      v-for="order in report.orders"
-      :key="order.order_sn"
-      class="order-row"
-    >
-      <td>↳ {{ order.date }}</td>
-      <td>Rp {{ formatRupiah(order.total_amount) }}</td>
-      <td>{{ order.order_sn }}</td>
-      <td>{{ order.status }}</td>
-    </tr>
-  </template>
-</tbody>
+              <tr v-for="order in report.orders" :key="order.order_sn" class="order-row">
+                <td>↳ {{ order.date }}</td>
+                <td>Rp {{ formatRupiah(order.total_amount) }}</td>
+                <td>{{ order.order_sn }}</td>
+                <td>{{ order.status }}</td>
+              </tr>
+            </template>
+          </tbody>
         </table>
       </div>
     </section>
@@ -88,23 +88,18 @@
       </p>
     </footer>
     <transition name="toast">
-  <div v-if="showToast" class="custom-toast">
-    <span class="toast-icon">✓</span>
-    <span>{{ toastMessage }}</span>
-    <button @click="showToast = false">×</button>
-  </div>
-</transition>
+      <div v-if="showToast" class="custom-toast">
+        <span class="toast-icon">✓</span>
+        <span>{{ toastMessage }}</span>
+        <button @click="showToast = false">×</button>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, computed, reactive } from "vue";
-import {
-  ShoppingBag,
-  Wallet,
-  Calculator,
-  Download
-} from "lucide-vue-next";
+import { ShoppingBag, Wallet, Calculator, Download } from "lucide-vue-next";
 
 const API_BASE = "https://sheena-backend-production.up.railway.app/api";
 
@@ -172,31 +167,31 @@ const topStats = computed(() => {
   const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
   return [
-  {
-    icon: Wallet,
-    label: "Total Revenue",
-    value: `Rp ${formatRupiah(totalRevenue)}`,
-    growth: `${salesSummary.value.revenue_growth >= 0 ? "+" : ""}${salesSummary.value.revenue_growth || 0}%`,
-    growthLabel: salesSummary.value.growth_label || "vs previous month",
-    trend: Number(salesSummary.value.revenue_growth) >= 0 ? "positive" : "negative",
-  },
-  {
-    icon: ShoppingBag,
-    label: "Total Orders",
-    value: totalOrders,
-    growth: `${salesSummary.value.orders_growth >= 0 ? "+" : ""}${salesSummary.value.orders_growth || 0}%`,
-    growthLabel: salesSummary.value.growth_label || "vs previous month",
-    trend: Number(salesSummary.value.orders_growth) >= 0 ? "positive" : "negative",
-  },
-  {
-    icon: Calculator,
-    label: "Avg. Order Value",
-    value: `Rp ${formatRupiah(avgOrderValue)}`,
-    growth: `${salesSummary.value.avg_order_growth >= 0 ? "+" : ""}${salesSummary.value.avg_order_growth || 0}%`,
-    growthLabel: salesSummary.value.growth_label || "vs previous month",
-    trend: Number(salesSummary.value.avg_order_growth) >= 0 ? "positive" : "negative",
-  },
-];
+    {
+      icon: Wallet,
+      label: "Total Revenue",
+      value: `Rp ${formatRupiah(totalRevenue)}`,
+      growth: `${salesSummary.value.revenue_growth >= 0 ? "+" : ""}${salesSummary.value.revenue_growth || 0}%`,
+      growthLabel: salesSummary.value.growth_label || "vs previous month",
+      trend: Number(salesSummary.value.revenue_growth) >= 0 ? "positive" : "negative",
+    },
+    {
+      icon: ShoppingBag,
+      label: "Total Orders",
+      value: totalOrders,
+      growth: `${salesSummary.value.orders_growth >= 0 ? "+" : ""}${salesSummary.value.orders_growth || 0}%`,
+      growthLabel: salesSummary.value.growth_label || "vs previous month",
+      trend: Number(salesSummary.value.orders_growth) >= 0 ? "positive" : "negative",
+    },
+    {
+      icon: Calculator,
+      label: "Avg. Order Value",
+      value: `Rp ${formatRupiah(avgOrderValue)}`,
+      growth: `${salesSummary.value.avg_order_growth >= 0 ? "+" : ""}${salesSummary.value.avg_order_growth || 0}%`,
+      growthLabel: salesSummary.value.growth_label || "vs previous month",
+      trend: Number(salesSummary.value.avg_order_growth) >= 0 ? "positive" : "negative",
+    },
+  ];
 });
 
 // Download Filter
@@ -332,9 +327,7 @@ const handleDownload = () => {
     ]),
   ];
 
-  const csvContent = rows
-    .map((row) => row.map((value) => `"${value ?? ""}"`).join(","))
-    .join("\n");
+  const csvContent = rows.map((row) => row.map((value) => `"${value ?? ""}"`).join(",")).join("\n");
 
   const blob = new Blob([csvContent], {
     type: "text/csv;charset=utf-8;",
@@ -388,7 +381,8 @@ onMounted(() => {
 }
 
 .report-table {
-  font-family: "FONTSPRING DEMO - The Seasons", serif;
+  /* font-family: "FONTSPRING DEMO - The Seasons", serif; */
+  font-family: "Inter", sans-serif;
 }
 
 /* Stat Cards */
