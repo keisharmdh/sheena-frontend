@@ -498,8 +498,8 @@ onMounted(() => {
 
 .product-info h3 {
   font-size: 13px;
-  line-height: 1.4;
-  min-height: 55px;
+  line-height: 1.5;
+  /* min-height: 55px; */
   font-family: "FONTSPRING DEMO - The Seasons";
   font-weight: 400;
 }
