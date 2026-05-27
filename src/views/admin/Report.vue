@@ -288,61 +288,85 @@ const monthlyData = ref([
   },
 ]);
 
+// const handleDownload = () => {
+//   let orderRows = [];
+
+//   salesReports.value.forEach((month) => {
+//     (month.orders || []).forEach((order) => {
+//       orderRows.push({
+//         month: month.month,
+//         date: order.date,
+//         order_sn: order.order_sn,
+//         status: order.status,
+//         total_amount: order.total_amount,
+//       });
+//     });
+//   });
+
+//   if (filter.startDate) {
+//     orderRows = orderRows.filter((item) => item.date >= filter.startDate);
+//   }
+
+//   if (filter.endDate) {
+//     orderRows = orderRows.filter((item) => item.date <= filter.endDate);
+//   }
+
+//   if (!orderRows.length) {
+//     triggerToast("Tidak ada data pada rentang tanggal tersebut.");
+//     return;
+//   }
+
+//   const rows = [
+//     ["Month", "Date", "Order SN", "Status", "Revenue"],
+//     ...orderRows.map((item) => [
+//       item.month,
+//       item.date,
+//       item.order_sn,
+//       item.status,
+//       item.total_amount,
+//     ]),
+//   ];
+
+//   const csvContent = rows.map((row) => row.map((value) => `"${value ?? ""}"`).join(",")).join("\n");
+
+//   const blob = new Blob([csvContent], {
+//     type: "text/csv;charset=utf-8;",
+//   });
+
+//   const url = URL.createObjectURL(blob);
+//   const link = document.createElement("a");
+
+//   link.href = url;
+//   link.download = `sales-report-${filter.startDate || "all"}-${filter.endDate || "all"}.csv`;
+//   link.click();
+
+//   URL.revokeObjectURL(url);
+
+//   triggerToast("Sales report downloaded successfully!");
+// };
+
 const handleDownload = () => {
-  let orderRows = [];
-
-  salesReports.value.forEach((month) => {
-    (month.orders || []).forEach((order) => {
-      orderRows.push({
-        month: month.month,
-        date: order.date,
-        order_sn: order.order_sn,
-        status: order.status,
-        total_amount: order.total_amount,
-      });
-    });
-  });
-
-  if (filter.startDate) {
-    orderRows = orderRows.filter((item) => item.date >= filter.startDate);
-  }
-
-  if (filter.endDate) {
-    orderRows = orderRows.filter((item) => item.date <= filter.endDate);
-  }
-
-  if (!orderRows.length) {
-    triggerToast("Tidak ada data pada rentang tanggal tersebut.");
+  // 1. Validasi: Pastikan admin sudah memilih tanggal mulai dan tanggal selesai
+  if (!filter.startDate || !filter.endDate) {
+    triggerToast("Gagal mendownload: Tanggal Start dan End wajib diisi!");
     return;
   }
 
-  const rows = [
-    ["Month", "Date", "Order SN", "Status", "Revenue"],
-    ...orderRows.map((item) => [
-      item.month,
-      item.date,
-      item.order_sn,
-      item.status,
-      item.total_amount,
-    ]),
-  ];
+  // 2. Validasi: Pastikan tanggal start tidak lebih besar dari tanggal end
+  if (filter.startDate > filter.endDate) {
+    triggerToast("Gagal mendownload: Tanggal Start tidak boleh melebihi Tanggal End.");
+    return;
+  }
 
-  const csvContent = rows.map((row) => row.map((value) => `"${value ?? ""}"`).join(",")).join("\n");
+  // 3. Trigger Toast untuk memberi tahu user proses download dimulai
+  triggerToast("Memproses download Excel...");
 
-  const blob = new Blob([csvContent], {
-    type: "text/csv;charset=utf-8;",
-  });
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = `sales-report-${filter.startDate || "all"}-${filter.endDate || "all"}.csv`;
-  link.click();
-
-  URL.revokeObjectURL(url);
-
-  triggerToast("Sales report downloaded successfully!");
+  // 4. Hit endpoint backend langsung menggunakan window.open
+  // Parameter dikirim via Query String sesuai instruksi backend
+  window.open(
+    `${API_BASE}/export-sales-report?start_date=${filter.startDate}&end_date=${filter.endDate}`,
+    "_blank",
+  );
 };
 
 onMounted(() => {
