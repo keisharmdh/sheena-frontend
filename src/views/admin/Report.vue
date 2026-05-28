@@ -300,7 +300,7 @@ const handleDownload = async () => {
     return;
   }
 
-  triggerToast("Processing Excel download...");
+  triggerToast("Processing to download report...");
 
   try {
     // 2. Fetch the file in the background (prevents page from blanking out)
