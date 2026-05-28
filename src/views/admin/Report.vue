@@ -312,7 +312,7 @@ const monthlyData = ref([
   );
 };*/
 
-const handleDownload = () => {
+const handleDownload = async () => {
   // 1. Validasi Input Tanggal
   if (!filter.startDate || !filter.endDate) {
     triggerToast("Gagal mendownload: Tanggal Start dan End wajib diisi!");
@@ -326,22 +326,45 @@ const handleDownload = () => {
 
   triggerToast("Memproses download Excel...");
 
-  // 2. Susun URL Endpoint Backend beserta Query Parameter-nya
-  const downloadUrl = `${API_BASE}/admin/dashboard/export-sales?start_date=${filter.startDate}&end_date=${filter.endDate}`;
+  try {
+    // 2. Ambil file menggunakan fetch biasa agar tidak memicu perpindahan halaman
+    const response = await fetch(
+      `${API_BASE}/admin/dashboard/export-sales?start_date=${filter.startDate}&end_date=${filter.endDate}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          // Jika backend kamu membutuhkan token login, un-comment baris di bawah ini:
+          Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
+        },
+      },
+    );
 
-  // 3. Gunakan trik Invisible Anchor Link agar browser mendownload di background
-  const link = document.createElement("a");
-  link.href = downloadUrl;
+    // 3. Jika backend mengembalikan error (404, 500, dll), tangkap di sini agar tidak blank page
+    if (!response.ok) {
+      throw new Error("Backend gagal memproses file Excel");
+    }
 
-  // Memaksa browser menganggap ini file download, bukan navigasi halaman
-  link.setAttribute("download", `sales_report_${filter.startDate}_to_${filter.endDate}.xlsx`);
+    // 4. Ubah response dari backend menjadi Blob file Excel
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
 
-  // Jalankan proses klik tersembunyi
-  document.body.appendChild(link);
-  link.click();
+    // 5. Trigger download otomatis di browser tanpa pindah page
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `sales_report_${filter.startDate}_to_${filter.endDate}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
 
-  // Bersihkan kembali elemen dari memori browser setelah selesai diklik
-  document.body.removeChild(link);
+    // 6. Bersihkan memori
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+
+    triggerToast("Sales report downloaded successfully!");
+  } catch (error) {
+    console.error("Download error:", error);
+    triggerToast("Gagal mendownload file. Terjadi kesalahan pada server backend.");
+  }
 };
 
 onMounted(() => {
