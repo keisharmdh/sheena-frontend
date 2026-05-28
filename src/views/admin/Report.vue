@@ -38,7 +38,7 @@
         </button>
       </div>
       <p class="helper-text">
-        Report will be downloaded in CSV format with detailed transaction data
+        Report will be downloaded in XLSX format with detailed transaction data
       </p>
     </section>
 
@@ -364,7 +364,7 @@ const handleDownload = () => {
   // 4. Hit endpoint backend langsung menggunakan window.open
   // Parameter dikirim via Query String sesuai instruksi backend
   window.open(
-    `${API_BASE}/export-sales-report?start_date=${filter.startDate}&end_date=${filter.endDate}`,
+    `${API_BASE}/admin/dashboard/export-sales?start_date=${filter.startDate}&end_date=${filter.endDate}`,
     "_blank",
   );
 };
