@@ -288,82 +288,57 @@ const monthlyData = ref([
   },
 ]);
 
-/*const handleDownload = () => {
-  // 1. Validasi: Pastikan admin sudah memilih tanggal mulai dan tanggal selesai
-  if (!filter.startDate || !filter.endDate) {
-    triggerToast("Gagal mendownload: Tanggal Start dan End wajib diisi!");
-    return;
-  }
-
-  // 2. Validasi: Pastikan tanggal start tidak lebih besar dari tanggal end
-  if (filter.startDate > filter.endDate) {
-    triggerToast("Gagal mendownload: Tanggal Start tidak boleh melebihi Tanggal End.");
-    return;
-  }
-
-  // 3. Trigger Toast untuk memberi tahu user proses download dimulai
-  triggerToast("Memproses download Excel...");
-
-  // 4. Hit endpoint backend langsung menggunakan window.open
-  // Parameter dikirim via Query String sesuai instruksi backend
-  window.open(
-    `${API_BASE}/admin/dashboard/export-sales?start_date=${filter.startDate}&end_date=${filter.endDate}`,
-    "_blank",
-  );
-};*/
-
 const handleDownload = async () => {
-  // 1. Validasi Input Tanggal
+  // 1. Input Date Validation
   if (!filter.startDate || !filter.endDate) {
-    triggerToast("Gagal mendownload: Tanggal Start dan End wajib diisi!");
+    triggerToast("Download failed: Start Date and End Date are required!");
     return;
   }
 
   if (filter.startDate > filter.endDate) {
-    triggerToast("Gagal mendownload: Tanggal Start tidak boleh melebihi Tanggal End.");
+    triggerToast("Download failed: Start Date cannot be later than End Date.");
     return;
   }
 
-  triggerToast("Memproses download Excel...");
+  triggerToast("Processing Excel download...");
 
   try {
-    // 2. Ambil file menggunakan fetch biasa agar tidak memicu perpindahan halaman
+    // 2. Fetch the file in the background (prevents page from blanking out)
     const response = await fetch(
       `${API_BASE}/admin/dashboard/export-sales?start_date=${filter.startDate}&end_date=${filter.endDate}`,
       {
         method: "GET",
         headers: {
           Accept: "application/json",
-          // Jika backend kamu membutuhkan token login, un-comment baris di bawah ini:
           Authorization: `Bearer ${localStorage.getItem("admin_token")}`,
         },
       },
     );
 
-    // 3. Jika backend mengembalikan error (404, 500, dll), tangkap di sini agar tidak blank page
+    // 3. Catch backend errors so it doesn't break the UI state
     if (!response.ok) {
-      throw new Error("Backend gagal memproses file Excel");
+      throw new Error("Backend failed to process the Excel file");
     }
 
-    // 4. Ubah response dari backend menjadi Blob file Excel
+    // 4. Convert response to Excel file Blob
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
 
-    // 5. Trigger download otomatis di browser tanpa pindah page
+    // 5. Trigger seamless automatic download
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", `sales_report_${filter.startDate}_to_${filter.endDate}.xlsx`);
     document.body.appendChild(link);
     link.click();
 
-    // 6. Bersihkan memori
+    // 6. Clean up memory
     document.body.removeChild(link);
     window.URL.revokeObjectURL(url);
 
     triggerToast("Sales report downloaded successfully!");
   } catch (error) {
     console.error("Download error:", error);
-    triggerToast("Gagal mendownload file. Terjadi kesalahan pada server backend.");
+    triggerToast("Download failed: Something went wrong on the server.");
   }
 };
 
