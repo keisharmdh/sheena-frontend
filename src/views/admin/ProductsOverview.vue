@@ -24,7 +24,7 @@
         </svg>
         <input type="text" placeholder="Search products..." v-model="searchQuery" />
       </div>
-      <button class="filter-btn">
+      <!-- <button class="filter-btn">
         <svg
           width="18"
           height="18"
@@ -35,7 +35,7 @@
         >
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
         </svg>
-      </button>
+      </button> -->
       <div class="date-display"></div>
     </div>
 
@@ -53,59 +53,45 @@
             </tr>
           </thead>
           <tbody>
-  <tr v-for="item in filteredProducts" :key="item.sku">
-    
-    <td class="product-cell">
-      <img :src="item.image" class="prod-img" />
+            <tr v-for="item in filteredProducts" :key="item.sku">
+              <td class="product-cell">
+                <img :src="item.image" class="prod-img" />
 
-      <div class="prod-info">
-        <p class="prod-name">{{ item.name }}</p>
-        <p class="prod-sku">SKU: {{ item.sku }}</p>
-      </div>
-    </td>
+                <div class="prod-info">
+                  <p class="prod-name">{{ item.name }}</p>
+                  <p class="prod-sku">SKU: {{ item.sku }}</p>
+                </div>
+              </td>
 
-    <td class="price-cell">
-      Rp {{ item.price.toLocaleString() }}
-    </td>
+              <td class="price-cell">Rp {{ item.price.toLocaleString() }}</td>
 
-    <td>
-      <span class="tag-collection">
-        {{ item.collection }}
-      </span>
-    </td>
+              <td>
+                <span class="tag-collection">
+                  {{ item.collection }}
+                </span>
+              </td>
 
-    <td>
-      <span
-        :class="[
-          'stock-text',
-          item.stock < 10 ? 'stock-low' : 'stock-normal'
-        ]"
-      >
-        {{ item.stock }} products
-      </span>
-    </td>
+              <td>
+                <span :class="['stock-text', item.stock < 10 ? 'stock-low' : 'stock-normal']">
+                  {{ item.stock }} products
+                </span>
+              </td>
 
-    <td class="size-text">
-      <ul class="size-list">
-        <li v-for="size in item.sizes" :key="size">
-          {{ size.replace(',', ' (') + ')' }}
-        </li>
-      </ul>
-    </td>
+              <td class="size-text">
+                <ul class="size-list">
+                  <li v-for="size in item.sizes" :key="size">
+                    {{ size.replace(",", " (") + ")" }}
+                  </li>
+                </ul>
+              </td>
 
-    <td>
-      <span
-        :class="[
-          'badge-status',
-          item.stock > 0 ? 'status-ready' : 'status-out'
-        ]"
-      >
-        {{ item.stock > 0 ? 'Ready' : 'Out of Stock' }}
-      </span>
-    </td>
-
-  </tr>
-</tbody>
+              <td>
+                <span :class="['badge-status', item.stock > 0 ? 'status-ready' : 'status-out']">
+                  {{ item.stock > 0 ? "Ready" : "Out of Stock" }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
         </table>
       </div>
       <div class="table-footer">
@@ -158,27 +144,18 @@ const fetchProducts = async () => {
 
     const result = await response.json();
 
-    const productList = Array.isArray(result.data)
-      ? result.data
-      : result.data?.data || [];
+    const productList = Array.isArray(result.data) ? result.data : result.data?.data || [];
 
     products.value = productList.map((product) => {
       const listings = product.product_listings || [];
 
-      const validPriceListing =
-        listings.find((item) => Number(item.price) > 0) || listings[0];
+      const validPriceListing = listings.find((item) => Number(item.price) > 0) || listings[0];
 
       const totalStock = listings.reduce((sum, item) => {
         return sum + Number(item.stock || 0);
       }, 0);
 
-      const sizes = [
-        ...new Set(
-          listings
-            .map((item) => item.variant_name)
-            .filter(Boolean)
-        ),
-      ];
+      const sizes = [...new Set(listings.map((item) => item.variant_name).filter(Boolean))];
 
       return {
         id: product.id_product,
@@ -198,9 +175,7 @@ const fetchProducts = async () => {
 
 const filteredProducts = computed(() => {
   return products.value.filter((item) => {
-    return item.name
-      .toLowerCase()
-      .includes(searchQuery.value.toLowerCase());
+    return item.name.toLowerCase().includes(searchQuery.value.toLowerCase());
   });
 });
 
