@@ -288,64 +288,7 @@ const monthlyData = ref([
   },
 ]);
 
-// const handleDownload = () => {
-//   let orderRows = [];
-
-//   salesReports.value.forEach((month) => {
-//     (month.orders || []).forEach((order) => {
-//       orderRows.push({
-//         month: month.month,
-//         date: order.date,
-//         order_sn: order.order_sn,
-//         status: order.status,
-//         total_amount: order.total_amount,
-//       });
-//     });
-//   });
-
-//   if (filter.startDate) {
-//     orderRows = orderRows.filter((item) => item.date >= filter.startDate);
-//   }
-
-//   if (filter.endDate) {
-//     orderRows = orderRows.filter((item) => item.date <= filter.endDate);
-//   }
-
-//   if (!orderRows.length) {
-//     triggerToast("Tidak ada data pada rentang tanggal tersebut.");
-//     return;
-//   }
-
-//   const rows = [
-//     ["Month", "Date", "Order SN", "Status", "Revenue"],
-//     ...orderRows.map((item) => [
-//       item.month,
-//       item.date,
-//       item.order_sn,
-//       item.status,
-//       item.total_amount,
-//     ]),
-//   ];
-
-//   const csvContent = rows.map((row) => row.map((value) => `"${value ?? ""}"`).join(",")).join("\n");
-
-//   const blob = new Blob([csvContent], {
-//     type: "text/csv;charset=utf-8;",
-//   });
-
-//   const url = URL.createObjectURL(blob);
-//   const link = document.createElement("a");
-
-//   link.href = url;
-//   link.download = `sales-report-${filter.startDate || "all"}-${filter.endDate || "all"}.csv`;
-//   link.click();
-
-//   URL.revokeObjectURL(url);
-
-//   triggerToast("Sales report downloaded successfully!");
-// };
-
-const handleDownload = () => {
+/*const handleDownload = () => {
   // 1. Validasi: Pastikan admin sudah memilih tanggal mulai dan tanggal selesai
   if (!filter.startDate || !filter.endDate) {
     triggerToast("Gagal mendownload: Tanggal Start dan End wajib diisi!");
@@ -367,6 +310,38 @@ const handleDownload = () => {
     `${API_BASE}/admin/dashboard/export-sales?start_date=${filter.startDate}&end_date=${filter.endDate}`,
     "_blank",
   );
+};*/
+
+const handleDownload = () => {
+  // 1. Validasi Input Tanggal
+  if (!filter.startDate || !filter.endDate) {
+    triggerToast("Gagal mendownload: Tanggal Start dan End wajib diisi!");
+    return;
+  }
+
+  if (filter.startDate > filter.endDate) {
+    triggerToast("Gagal mendownload: Tanggal Start tidak boleh melebihi Tanggal End.");
+    return;
+  }
+
+  triggerToast("Memproses download Excel...");
+
+  // 2. Susun URL Endpoint Backend beserta Query Parameter-nya
+  const downloadUrl = `${API_BASE}/admin/dashboard/export-sales?start_date=${filter.startDate}&end_date=${filter.endDate}`;
+
+  // 3. Gunakan trik Invisible Anchor Link agar browser mendownload di background
+  const link = document.createElement("a");
+  link.href = downloadUrl;
+
+  // Memaksa browser menganggap ini file download, bukan navigasi halaman
+  link.setAttribute("download", `sales_report_${filter.startDate}_to_${filter.endDate}.xlsx`);
+
+  // Jalankan proses klik tersembunyi
+  document.body.appendChild(link);
+  link.click();
+
+  // Bersihkan kembali elemen dari memori browser setelah selesai diklik
+  document.body.removeChild(link);
 };
 
 onMounted(() => {

@@ -24,18 +24,6 @@
         </svg>
         <input type="text" placeholder="Search products..." v-model="searchQuery" />
       </div>
-      <!-- <button class="filter-btn">
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-        </svg>
-      </button> -->
       <div class="date-display"></div>
     </div>
 
