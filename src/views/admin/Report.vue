@@ -54,7 +54,7 @@
               <th>GROWTH</th>
             </tr>
           </thead>
-          <tbody>
+          <!-- <tbody>
             <template v-for="report in salesReports" :key="report.month_key">
               <tr class="month-row">
                 <td>{{ report.month }}</td>
@@ -70,6 +70,42 @@
               </tr>
 
               <tr v-for="order in report.orders" :key="order.order_sn" class="order-row">
+                <td>↳ {{ order.date }}</td>
+                <td>Rp {{ formatRupiah(order.total_amount) }}</td>
+                <td>{{ order.order_sn }}</td>
+                <td>{{ order.status }}</td>
+              </tr>
+            </template>
+          </tbody> -->
+          <tbody>
+            <template v-for="report in salesReports" :key="report.month_key">
+              <tr class="month-row" @click="toggleMonth(report.month_key)" style="cursor: pointer">
+                <td>
+                  <span
+                    class="arrow-indicator"
+                    :class="{ 'is-expanded': expandedMonths.includes(report.month_key) }"
+                  >
+                    ▶
+                  </span>
+                  {{ report.month }}
+                </td>
+                <td>Rp {{ formatRupiah(report.total_revenue) }}</td>
+                <td>{{ report.total_orders }} orders</td>
+                <td :class="report.growth >= 0 ? 'growth-positive' : 'growth-negative'">
+                  {{
+                    report.growth === null
+                      ? "-"
+                      : `${report.growth >= 0 ? "+" : ""}${report.growth}%`
+                  }}
+                </td>
+              </tr>
+
+              <tr
+                v-if="expandedMonths.includes(report.month_key)"
+                v-for="order in report.orders"
+                :key="order.order_sn"
+                class="order-row"
+              >
                 <td>↳ {{ order.date }}</td>
                 <td>Rp {{ formatRupiah(order.total_amount) }}</td>
                 <td>{{ order.order_sn }}</td>
@@ -113,6 +149,9 @@ const salesReports = ref([]);
 const toastMessage = ref("");
 const showToast = ref(false);
 
+// State baru untuk menampung data bulan yang sedang dibuka (diklik)
+const expandedMonths = ref([]);
+
 const triggerToast = (message) => {
   toastMessage.value = message;
   showToast.value = true;
@@ -126,6 +165,16 @@ const formatRupiah = (value) => {
   return Number(value || 0).toLocaleString("id-ID");
 };
 
+// Fungsi logika untuk membuka dan menutup baris bulan
+const toggleMonth = (monthKey) => {
+  const index = expandedMonths.value.indexOf(monthKey);
+  if (index > -1) {
+    expandedMonths.value.splice(index, 1); // Tutup baris jika sudah terbuka
+  } else {
+    expandedMonths.value.push(monthKey); // Buka baris jika belum terbuka
+  }
+};
+
 const fetchSalesSummary = async () => {
   try {
     const response = await fetch(`${API_BASE}/admin/sales`, {
@@ -136,7 +185,6 @@ const fetchSalesSummary = async () => {
     });
 
     const result = await response.json();
-
     salesSummary.value = result.data;
   } catch (error) {
     console.error("Fetch sales summary error:", error);
@@ -549,6 +597,20 @@ onMounted(() => {
   font-weight: 700;
 }
 
+/* Kustomisasi gaya indikator panah */
+.arrow-indicator {
+  display: inline-block;
+  font-size: 10px;
+  margin-right: 6px;
+  color: #8c6a43;
+  transition: transform 0.2s ease;
+}
+
+/* Animasi memutar panah saat meluncur ke bawah (expanded) */
+.arrow-indicator.is-expanded {
+  transform: rotate(90deg);
+}
+
 /* Badges */
 .growth-badge {
   display: inline-block;
@@ -598,6 +660,11 @@ onMounted(() => {
   font-weight: 700;
   background: #fbfbfb;
   color: #1a1a1a;
+}
+
+/* Efek hover samar di baris bulan untuk memberi petunjuk klik */
+.month-row:hover td {
+  background: #f5f5f5;
 }
 
 .order-row td {
