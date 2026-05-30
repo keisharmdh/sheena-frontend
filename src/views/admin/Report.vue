@@ -586,6 +586,7 @@ onMounted(() => {
   padding: 18px 10px;
   font-size: 14px;
   border-bottom: 1px solid #f8f9fa;
+  font-family: "FONTSPRING DEMO - The Seasons", serif;
 }
 
 .month-cell {
