@@ -574,7 +574,7 @@ onMounted(() => {
   text-align: left;
   font-family: "FONTSPRING DEMO - The Seasons", serif;
   font-size: 13px; /* Sedikit dinaikkan ukurannya agar proporsi serif terlihat bagus */
-  font-weight: 600;
+  font-weight: 400;
   color: #555; /* Diubah sedikit lebih gelap dibanding #bbb lama agar lebih readable */
   padding: 15px 10px;
   border-bottom: 1px solid #f8f9fa;
