@@ -557,7 +557,7 @@ onMounted(() => {
 .report-table {
   width: 100%;
   border-collapse: collapse;
-  font-family: "FONTSPRING DEMO - The Seasons", serif;
+  font-family: "Inter", serif;
 }
 
 /* .report-table th {
