@@ -559,7 +559,7 @@ onMounted(() => {
   border-collapse: collapse;
 }
 
-.report-table th {
+/* .report-table th {
   text-align: left;
   font-size: 11px;
   color: #bbb;
@@ -567,6 +567,19 @@ onMounted(() => {
   border-bottom: 1px solid #f8f9fa;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+} */
+
+/* FONT HEADER DIUBAH DI SINI */
+.report-table th {
+  text-align: left;
+  font-family: "FONTSPRING DEMO - The Seasons", serif;
+  font-size: 13px; /* Sedikit dinaikkan ukurannya agar proporsi serif terlihat bagus */
+  font-weight: 600;
+  color: #555; /* Diubah sedikit lebih gelap dibanding #bbb lama agar lebih readable */
+  padding: 15px 10px;
+  border-bottom: 1px solid #f8f9fa;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
 .report-table td {
